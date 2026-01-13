@@ -1,0 +1,98 @@
+
+
+---
+
+## `/task_data/` 目录数据结构文档
+
+### 文件清单
+
+| 文件名 | 变量名 | 维度 | 说明 |
+|--------|--------|------|------|
+| `task_data.mat` | `rd_out` | (31, 4) | 任务态fMRI时间序列 |
+| `meanRTrun1.mat` | `meanRT` | (32, 9) | Run 1 行为数据 |
+| `meanRTrun2.mat` | `meanRT` | (32, 9) | Run 2 行为数据 |
+| `meanRTrun3.mat` | `meanRT` | (32, 9) | Run 3 行为数据 |
+| `Multi_AUT.mat` | — | (1,) | MATLAB table对象，Python不可直接读取，稍后单独讲解 |
+
+---
+
+### `task_data.mat` 结构
+
+**变量**: `rd_out`，object数组，shape=(31, 4)
+
+```
+rd_out[i, 0] → ndarray, shape=(560, 300), dtype=float64  # Run 1 时间序列
+rd_out[i, 1] → ndarray, shape=(560, 300), dtype=float64  # Run 2 时间序列
+rd_out[i, 2] → ndarray, shape=(560, 300), dtype=float64  # Run 3 时间序列
+rd_out[i, 3] → ndarray, shape=(1,), dtype='<U10'         # 被试ID
+```
+
+- `i` = 被试索引 (0~30)
+- 560 = 时间点数（TR）
+- 300 = Schaefer 300脑区
+- 数值为z-score标准化后的BOLD信号
+
+**读取代码**:
+```python
+import scipy.io as sio
+import numpy as np
+
+mat = sio.loadmat('task_data.mat')
+data = mat['rd_out']  # shape: (31, 4)
+
+# 第i个被试、第r个run的时间序列
+i, r = 0, 0
+ts = data[i, r]  # shape: (560, 300)
+
+# 第i个被试的ID
+sub_id = data[i, 3][0]  # 'sub-001001'
+
+# 第i个被试、第r个run、第j个脑区的时间序列
+j = 0
+roi_ts = data[i, r][:, j]  # shape: (560,)
+
+# 提取所有被试某一run为3D数组
+run1_all = np.stack([data[i, 0] for i in range(31)])  # shape: (31, 560, 300)
+```
+
+---
+
+### `meanRTrun*.mat` 结构
+
+**变量**: `meanRT`，ndarray，shape=(32, 9)，dtype=int
+
+- 行 = 32个被试
+- 列 = 9个trial/item
+- 数值 = 反应时间（秒）
+
+**读取代码**:
+```python
+mat = sio.loadmat('meanRTrun1.mat')
+rt = mat['meanRT']  # shape: (32, 9)
+
+# 第i个被试、第t个trial的反应时间
+i, t = 0, 0
+rt_value = rt[i, t]  # 整数，单位：秒
+
+# 第i个被试所有trial的平均反应时间
+mean_rt = rt[i, :].mean()
+```
+
+---
+
+**Multi_AUT.mat**
+
+MATLAB table 对象（Python 需先用 MATLAB 转为 CSV 读取）。864 行 × 5 列，记录 AUT 任务的试次分配表：
+
+| 列名 | 含义 | 取值 |
+|------|------|------|
+| Var1 | 被试编号 | `'1s'` ~ `'32s'`（32人） |
+| runID | run编号 | 1, 2, 3 |
+| itemID | 物品ID | 如 `'5nu'`, `'3c'` |
+| item | 物品名称 | 中文，如 `'浴缸'`, `'铅笔'` |
+| cue | 条件 | `'au'`（创新用途）/ `'oc'`（普通用途）/ NaN |
+
+每被试 27 行（3 run × 9 item/run）。若需筛选某被试某 run 的数据：`df[(df['Var1']=='1s') & (df['runID']==1)]`。
+
+---
+

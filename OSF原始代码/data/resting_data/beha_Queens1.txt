@@ -1,0 +1,5 @@
+subID	gender	age	creativity
+1	1	22	1
+2	2	35	2
+3	2	22	5.5
+（省略60行）

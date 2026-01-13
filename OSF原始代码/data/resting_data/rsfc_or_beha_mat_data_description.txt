@@ -1,0 +1,53 @@
+我们删掉了这里的数据库，为了确保尺寸有限。以下是对原本的内容的介绍：
+
+## `/resting_data/` 目录数据结构文档
+
+### 文件清单
+
+| 文件名 | 变量名 | 维度 | 被试数 | 时间点 | 脑区数 | 含被试ID |
+|--------|--------|------|--------|--------|--------|----------|
+| `rsfc_GBB1.mat` | `rsfc_shen` | (968, 2) | 968 | 242 | 268 | ✓ |
+| `rsfc_GBB2.mat` | `rsfc_shen` | (968, 2) | 968 | 242 | 268 | ✓ |
+| `rsfc_Queens1.mat` | `rsfc_mc` | (66, 2) | 66 | 150/158 | 300 | ✓ |
+| `rsfc_Queens2.mat` | `rsfc_mc` | (66, 2) | 66 | 150/158 | 300 | ✓ |
+| `rsfc_SLIM1_up.mat` | `rsfc_mc` | (272, 1) | 272 | 242 | 300 | ✗ |
+| `rsfc_SLIM2.mat` | `rd_out` | (223, 2) | 223 | 242 | 300 | ✓ |
+| `rsfc_UNCG.mat` | `rsfc_mc` | (179, 1) | 179 | 150 | 300 | ✗ |
+
+### 数据结构
+
+每个`.mat`文件包含一个**object数组**（MATLAB cell array），结构如下：
+
+```
+变量[i, 0] → numpy.ndarray, shape=(n_timepoints, n_rois), dtype=float64
+变量[i, 1] → numpy.ndarray, shape=(1,), dtype='<U*' (被试ID字符串，部分文件无此列)
+```
+
+- `i` = 被试索引 (0 ~ n_subjects-1)
+- 第0列：静息态fMRI的ROI时间序列，每行一个TR，每列一个脑区
+- 第1列：被试ID（如 `'sub-15001'`），部分文件无此列
+
+### 读取代码
+
+```python
+import scipy.io as sio
+import numpy as np
+
+mat = sio.loadmat('rsfc_GBB1.mat')
+data = mat['rsfc_shen']  # shape: (968, 2)
+
+# 获取第i个被试的时间序列
+i = 0
+ts = data[i, 0]  # shape: (242, 268)
+
+# 获取第i个被试的ID（如有）
+sub_id = data[i, 1][0] if data.shape[1] > 1 else None  # 'sub-15001'
+
+# 获取第i个被试、第j个脑区的时间序列
+j = 0
+roi_ts = data[i, 0][:, j]  # shape: (242,)
+
+# 批量提取所有被试的时间序列为3D数组
+all_ts = np.stack([data[i, 0] for i in range(data.shape[0])])  # shape: (968, 242, 268)
+```
+
