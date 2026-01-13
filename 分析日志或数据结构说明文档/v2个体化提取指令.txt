@@ -1,0 +1,6 @@
+python extract_roi_timeseries_v2_individualized.py ^
+    --bold_dir "D:/D/Back/fMRI/deepprep_output/postproc/BOLD" ^
+    --atlas_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/Analysis/Atlas" ^
+    --ind_parc_dir "D:/D/Back/fMRI/MSHBM_output_skipped" ^
+    --output_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized" ^
+    --desc regression

@@ -1,0 +1,21 @@
+docker run -it --rm --gpus all ^
+
+  -v D:\D\Back\fMRI\bids_dataset:/input ^
+
+  -v D:\D\Back\fMRI\deepprep_output:/output ^
+
+  -v C:\Users\Boletu\Downloads\license.txt:/fs_license.txt ^
+
+  deepprep:25.1.0-rtx5090-v11 ^
+
+  /input /output participant ^
+
+  --bold_task_type rest ^
+
+  --fs_license_file /fs_license.txt ^
+
+  --device 0
+
+
+
+这是我们此前使用的预处理代码。我现在需要你帮助我基于这个代码，打开GUI后处理的界面。

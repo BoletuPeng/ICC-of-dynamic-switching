@@ -1,0 +1,70 @@
+Microsoft Windows [版本 10.0.26100.7462]
+(c) Microsoft Corporation。保留所有权利。
+
+C:\Windows\System32>cd C:\Users\Boletu\Desktop\25T4\deepprep_output\Analysis
+
+C:\Users\Boletu\Desktop\25T4\deepprep_output\Analysis>python extract_roi_timeseries_v2_individualized.py ^
+More?     --bold_dir "D:/D/Back/fMRI/deepprep_output/postproc/BOLD" ^
+More?     --atlas_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/Analysis/Atlas" ^
+More?     --ind_parc_dir "D:/D/Back/fMRI/MSHBM_output_skipped" ^
+More?     --output_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized" ^
+More?     --desc regression
+======================================================================
+ROI Timeseries Extraction v2 - Individualized Parcellation
+======================================================================
+
+[1/5] Loading atlas files...
+  Loading Schaefer 2018 annot files...
+  Loading Kong 2022 annot files...
+  Loading mapping file...
+
+[2/5] Building DMN/ECN definitions...
+  Schaefer definition: 58 DMN + 48 ECN = 106 parcels
+  Kong definition: 59 DMN + 54 ECN = 113 parcels
+
+[3/5] Saving ROI metadata...
+  Saved: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized\roi_info.json
+
+[4/5] Scanning subjects...
+  Found 40 subjects in BOLD dir
+  Found 40 subjects with individualized parcellation
+
+[5/5] Extracting timeseries (parallel with 8 workers)...
+  Total tasks: 240 (subjects × sessions)
+  Progress: 240/240 | sub-044 ses-05 (ROI:S106/K113)
+  Completed 240 tasks
+
+  Saving Schaefer ROI data...
+    Saved 40 subjects
+  Saving Schaefer vertex data...
+    Saved 40 subjects
+  Saving Kong ROI data...
+    Saved 40 subjects
+  Saving Kong vertex data...
+    Saved 40 subjects
+
+======================================================================
+EXTRACTION COMPLETE!
+======================================================================
+
+Output directory: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized
+
+Schaefer definition (Networks defined by Schaefer 2018):
+  ROI level: 106 parcels (DMN: 58, ECN: 48)
+
+Kong definition (Networks defined by Kong 2022):
+  ROI level: 113 parcels (DMN: 59, ECN: 54)
+
+Total subjects processed: 40
+
+Directory structure:
+  C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/
+  ├── Schaefer/
+  │   ├── ROI/           # 106 ROIs × 40 subjects
+  │   └── Vox_Vert/      # vertex-level × 40 subjects
+  ├── Kong/
+  │   ├── ROI/           # 113 ROIs × 40 subjects
+  │   └── Vox_Vert/      # vertex-level × 40 subjects
+  └── roi_info.json
+
+C:\Users\Boletu\Desktop\25T4\deepprep_output\Analysis>

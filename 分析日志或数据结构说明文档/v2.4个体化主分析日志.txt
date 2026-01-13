@@ -1,0 +1,1256 @@
+Microsoft Windows [版本 10.0.26100.7462]
+(c) Microsoft Corporation。保留所有权利。
+
+C:\Windows\System32>cd C:\Users\Boletu\Desktop\25T4\deepprep_output\Methods
+
+C:\Users\Boletu\Desktop\25T4\deepprep_output\Methods>python run_dynamic_analysis_by_session_parallel_v2.4_individualized.py ^
+More?     --roi_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized" ^
+More?     --behavior_file "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output/behavior/behavior_data.csv" ^
+More?     --methods_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/Methods" ^
+More?     --output_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis" ^
+More?     --level ROI ^
+More?     --Louv 500 ^
+More?     --LouvTau 0.1 ^
+More?     --LouvReps 500 ^
+More?     --Kmns 100 ^
+More?     --tSNR --tSNR_threshold 2.0 ^
+More?     --Motion --motion_file "C:/Users/Boletu/Desktop/25T4/deepprep_output/motion_analysis/excluded_sessions.txt" ^
+More?     --n_jobs 23
+
+Loaded motion exclusion list: 22 sessions to exclude
+  sub-003 ses-05
+  sub-007 ses-03
+  sub-007 ses-04
+  sub-008 ses-03
+  sub-009 ses-05
+  ... and 17 more
+======================================================================
+Dynamic Functional Analysis - v2.4 Individualized
+Started at: 2026-01-08 22:37:03
+======================================================================
+
+Global Configuration:
+  Data format: Individualized parcellation (per-subject files)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    Method: agreement_weighted + consensus_und (MATLAB-equivalent)
+  K-means n_init: 100
+  tSNR filtering: ENABLED
+  Motion filtering: ENABLED
+  Skip frames: 5
+
+Will analyze 2 space/level combination(s):
+  - Schaefer/ROI
+  - Kong/ROI
+
+For each combination, will run:
+  - Without tSNR filtering
+  - With tSNR filtering (±2.0SD)
+  - Without Motion exclusion
+  - With Motion exclusion
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Schaefer_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Schaefer - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: DISABLED
+  Motion filtering: DISABLED
+
+[1/6] Loading data by session from Schaefer/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 106 features
+    ses-02: 40 subjects, 242 timepoints, 106 features
+    ses-03: 40 subjects, 242 timepoints, 106 features
+    ses-04: 40 subjects, 242 timepoints, 106 features
+    ses-05: 40 subjects, 242 timepoints, 106 features
+    ses-06: 40 subjects, 242 timepoints, 106 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 58 DMN + 48 ECN = 106 total
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Total tasks: 240
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 240/240 [09:45<00:00,  2.44s/it]
+
+  Completed in 586.2s (2.44s per run)
+  Success: 240, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 240
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.081 [-0.122, -0.011]
+    F = 0.55, p = 0.9859
+  switch_rate:
+    ICC(2,1) = -0.081 [-0.122, -0.011]
+    F = 0.55, p = 0.9859
+  balance:
+    ICC(2,1) = 0.031 [-0.042, 0.147]
+    F = 1.19, p = 0.2180
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = -0.0002, p = 0.9990, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = -0.0002, p = 0.9990
+
+  === Balance vs Creativity ===
+  Pearson r = -0.0663, p = 0.6883
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0044
+  Quadratic R² = 0.0231
+  Quadratic coefficients: a=-5.1043, b=1.8509, c=-0.0600
+  → Inverted-U shape detected (negative quadratic term)
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = 0.1933, p = 0.2321, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Schaefer
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: No
+  Motion filtering: No
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 6.0 ± 0.0
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 44.3 ± 3.1
+  Switch rate: 19.84 ± 1.40 per 100 windows
+  Balance: 0.2253 ± 0.1393
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.081 (Poor)
+  switch_rate: ICC = -0.081 (Poor)
+  balance: ICC = 0.031 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=-0.000, p=0.9990
+
+Processing time: 586.2s (2.44s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Schaefer_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Schaefer_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Schaefer - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: DISABLED
+  Motion filtering: ENABLED
+    Excluded sessions: 22
+
+[1/6] Loading data by session from Schaefer/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 106 features
+    ses-02: 40 subjects, 242 timepoints, 106 features
+    ses-03: 40 subjects, 242 timepoints, 106 features
+    ses-04: 40 subjects, 242 timepoints, 106 features
+    ses-05: 40 subjects, 242 timepoints, 106 features
+    ses-06: 40 subjects, 242 timepoints, 106 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 58 DMN + 48 ECN = 106 total
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Motion filtering: 22 session-runs excluded
+  Total tasks: 218
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 218/218 [09:04<00:00,  2.50s/it]
+
+  Completed in 544.7s (2.50s per run)
+  Success: 218, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 218
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.087 [-0.134, 0.006]
+    F = 0.51, p = 0.9692
+  switch_rate:
+    ICC(2,1) = -0.087 [-0.134, 0.006]
+    F = 0.51, p = 0.9692
+  balance:
+    ICC(2,1) = 0.050 [-0.043, 0.217]
+    F = 1.33, p = 0.1619
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0636, p = 0.7006, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0636, p = 0.7006
+
+  === Balance vs Creativity ===
+  Pearson r = -0.0251, p = 0.8795
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0006
+  Quadratic R² = 0.0031
+  Quadratic coefficients: a=-1.5008, b=0.4805, c=0.0007
+  → Inverted-U shape detected (negative quadratic term)
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = 0.2237, p = 0.1652, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Schaefer
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: No
+  Motion filtering: Yes
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 5.5 ± 0.8
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 44.4 ± 3.2
+  Switch rate: 19.91 ± 1.42 per 100 windows
+  Balance: 0.2181 ± 0.1564
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.087 (Poor)
+  switch_rate: ICC = -0.087 (Poor)
+  balance: ICC = 0.050 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.064, p=0.7006
+
+Processing time: 544.7s (2.50s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Schaefer_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Schaefer_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Schaefer - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: ENABLED
+  Motion filtering: DISABLED
+
+[1/6] Loading data by session from Schaefer/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 106 features
+    ses-02: 40 subjects, 242 timepoints, 106 features
+    ses-03: 40 subjects, 242 timepoints, 106 features
+    ses-04: 40 subjects, 242 timepoints, 106 features
+    ses-05: 40 subjects, 242 timepoints, 106 features
+    ses-06: 40 subjects, 242 timepoints, 106 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 58 DMN + 48 ECN = 106 total
+
+[1.5/6] Applying tSNR filtering (threshold: ±2.0SD)...
+
+  Computing tSNR for each session...
+    ses-01: 7/106 features excluded (6.6%)
+    ses-02: 4/106 features excluded (3.8%)
+    ses-03: 7/106 features excluded (6.6%)
+    ses-04: 7/106 features excluded (6.6%)
+    ses-05: 5/106 features excluded (4.7%)
+    ses-06: 3/106 features excluded (2.8%)
+
+  Global tSNR statistics:
+    Mean ± SD: 0.00 ± 0.02
+
+  After tSNR filtering:
+    ses-01: 99 features remaining
+    ses-02: 102 features remaining
+    ses-03: 99 features remaining
+    ses-04: 99 features remaining
+    ses-05: 101 features remaining
+    ses-06: 103 features remaining
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Total tasks: 240
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 240/240 [09:02<00:00,  2.26s/it]
+
+  Completed in 543.6s (2.26s per run)
+  Success: 240, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 240
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.023 [-0.082, 0.071]
+    F = 0.86, p = 0.7112
+  switch_rate:
+    ICC(2,1) = -0.023 [-0.082, 0.071]
+    F = 0.86, p = 0.7112
+  balance:
+    ICC(2,1) = 0.039 [-0.036, 0.158]
+    F = 1.25, p = 0.1675
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0402, p = 0.8079, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0402, p = 0.8079
+
+  === Balance vs Creativity ===
+  Pearson r = -0.1679, p = 0.3070
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0282
+  Quadratic R² = 0.0294
+  Quadratic coefficients: a=-1.0121, b=-0.6849, c=0.1958
+  → Inverted-U shape detected (negative quadratic term)
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = 0.1704, p = 0.2930, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Schaefer
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: Yes (±2.0SD)
+  Motion filtering: No
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 6.0 ± 0.0
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 44.3 ± 3.7
+  Switch rate: 19.87 ± 1.67 per 100 windows
+  Balance: 0.2019 ± 0.1449
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.023 (Poor)
+  switch_rate: ICC = -0.023 (Poor)
+  balance: ICC = 0.039 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.040, p=0.8079
+
+Processing time: 543.6s (2.26s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Schaefer_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Schaefer_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Schaefer - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: ENABLED
+  Motion filtering: ENABLED
+    Excluded sessions: 22
+
+[1/6] Loading data by session from Schaefer/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 106 features
+    ses-02: 40 subjects, 242 timepoints, 106 features
+    ses-03: 40 subjects, 242 timepoints, 106 features
+    ses-04: 40 subjects, 242 timepoints, 106 features
+    ses-05: 40 subjects, 242 timepoints, 106 features
+    ses-06: 40 subjects, 242 timepoints, 106 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 58 DMN + 48 ECN = 106 total
+
+[1.5/6] Applying tSNR filtering (threshold: ±2.0SD)...
+
+  Computing tSNR for each session...
+    ses-01: 7/106 features excluded (6.6%)
+    ses-02: 4/106 features excluded (3.8%)
+    ses-03: 7/106 features excluded (6.6%)
+    ses-04: 7/106 features excluded (6.6%)
+    ses-05: 5/106 features excluded (4.7%)
+    ses-06: 3/106 features excluded (2.8%)
+
+  Global tSNR statistics:
+    Mean ± SD: 0.00 ± 0.02
+
+  After tSNR filtering:
+    ses-01: 99 features remaining
+    ses-02: 102 features remaining
+    ses-03: 99 features remaining
+    ses-04: 99 features remaining
+    ses-05: 101 features remaining
+    ses-06: 103 features remaining
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Motion filtering: 22 session-runs excluded
+  Total tasks: 218
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 218/218 [08:15<00:00,  2.27s/it]
+
+  Completed in 495.8s (2.27s per run)
+  Success: 218, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 218
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.045 [-0.108, 0.073]
+    F = 0.73, p = 0.8079
+  switch_rate:
+    ICC(2,1) = -0.045 [-0.108, 0.073]
+    F = 0.73, p = 0.8079
+  balance:
+    ICC(2,1) = 0.041 [-0.050, 0.204]
+    F = 1.26, p = 0.2065
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0360, p = 0.8276, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0360, p = 0.8276
+
+  === Balance vs Creativity ===
+  Pearson r = -0.1014, p = 0.5389
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0103
+  Quadratic R² = 0.0139
+  Quadratic coefficients: a=-1.4897, b=-0.0894, c=0.1061
+  → Inverted-U shape detected (negative quadratic term)
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = 0.1373, p = 0.3983, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Schaefer
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: Yes (±2.0SD)
+  Motion filtering: Yes
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 5.5 ± 0.8
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 44.4 ± 3.9
+  Switch rate: 19.93 ± 1.77 per 100 windows
+  Balance: 0.1954 ± 0.1692
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.045 (Poor)
+  switch_rate: ICC = -0.045 (Poor)
+  balance: ICC = 0.041 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.036, p=0.8276
+
+Processing time: 495.8s (2.27s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Schaefer_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Kong_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Kong - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: DISABLED
+  Motion filtering: DISABLED
+
+[1/6] Loading data by session from Kong/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 113 features
+    ses-02: 40 subjects, 242 timepoints, 113 features
+    ses-03: 40 subjects, 242 timepoints, 113 features
+    ses-04: 40 subjects, 242 timepoints, 113 features
+    ses-05: 40 subjects, 242 timepoints, 113 features
+    ses-06: 40 subjects, 242 timepoints, 113 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 59 DMN + 54 ECN = 113 total
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Total tasks: 240
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 240/240 [11:22<00:00,  2.84s/it]
+
+  Completed in 683.1s (2.85s per run)
+  Success: 240, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 240
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.007 [-0.069, 0.096]
+    F = 0.96, p = 0.5430
+  switch_rate:
+    ICC(2,1) = -0.007 [-0.069, 0.096]
+    F = 0.96, p = 0.5430
+  balance:
+    ICC(2,1) = 0.049 [-0.028, 0.172]
+    F = 1.32, p = 0.1161
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0741, p = 0.6541, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0741, p = 0.6541
+
+  === Balance vs Creativity ===
+  Pearson r = -0.2263, p = 0.1659
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0512
+  Quadratic R² = 0.0555
+  Quadratic coefficients: a=1.5518, b=-1.7670, c=0.2172
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = -0.0598, p = 0.7139, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Kong
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: No
+  Motion filtering: No
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 6.0 ± 0.0
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 43.3 ± 4.3
+  Switch rate: 19.40 ± 1.91 per 100 windows
+  Balance: 0.1791 ± 0.1729
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.007 (Poor)
+  switch_rate: ICC = -0.007 (Poor)
+  balance: ICC = 0.049 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.074, p=0.6541
+
+Processing time: 683.1s (2.85s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Kong_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Kong_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Kong - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: DISABLED
+  Motion filtering: ENABLED
+    Excluded sessions: 22
+
+[1/6] Loading data by session from Kong/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 113 features
+    ses-02: 40 subjects, 242 timepoints, 113 features
+    ses-03: 40 subjects, 242 timepoints, 113 features
+    ses-04: 40 subjects, 242 timepoints, 113 features
+    ses-05: 40 subjects, 242 timepoints, 113 features
+    ses-06: 40 subjects, 242 timepoints, 113 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 59 DMN + 54 ECN = 113 total
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Motion filtering: 22 session-runs excluded
+  Total tasks: 218
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 218/218 [10:22<00:00,  2.86s/it]
+
+  Completed in 623.2s (2.86s per run)
+  Success: 218, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 218
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.038 [-0.101, 0.089]
+    F = 0.79, p = 0.7437
+  switch_rate:
+    ICC(2,1) = -0.038 [-0.101, 0.089]
+    F = 0.79, p = 0.7437
+  balance:
+    ICC(2,1) = 0.062 [-0.034, 0.235]
+    F = 1.41, p = 0.1141
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.1280, p = 0.4373, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.1280, p = 0.4373
+
+  === Balance vs Creativity ===
+  Pearson r = -0.1774, p = 0.2801
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0315
+  Quadratic R² = 0.0317
+  Quadratic coefficients: a=0.3270, b=-0.9738, c=0.1407
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = -0.1053, p = 0.5178, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Kong
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: No
+  Motion filtering: Yes
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 5.5 ± 0.8
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 43.2 ± 4.4
+  Switch rate: 19.38 ± 1.97 per 100 windows
+  Balance: 0.1715 ± 0.1832
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.038 (Poor)
+  switch_rate: ICC = -0.038 (Poor)
+  balance: ICC = 0.062 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.128, p=0.4373
+
+Processing time: 623.2s (2.86s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Kong_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Kong_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Kong - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: ENABLED
+  Motion filtering: DISABLED
+
+[1/6] Loading data by session from Kong/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 113 features
+    ses-02: 40 subjects, 242 timepoints, 113 features
+    ses-03: 40 subjects, 242 timepoints, 113 features
+    ses-04: 40 subjects, 242 timepoints, 113 features
+    ses-05: 40 subjects, 242 timepoints, 113 features
+    ses-06: 40 subjects, 242 timepoints, 113 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 59 DMN + 54 ECN = 113 total
+
+[1.5/6] Applying tSNR filtering (threshold: ±2.0SD)...
+
+  Computing tSNR for each session...
+    ses-01: 7/113 features excluded (6.2%)
+    ses-02: 6/113 features excluded (5.3%)
+    ses-03: 5/113 features excluded (4.4%)
+    ses-04: 5/113 features excluded (4.4%)
+    ses-05: 4/113 features excluded (3.5%)
+    ses-06: 4/113 features excluded (3.5%)
+
+  Global tSNR statistics:
+    Mean ± SD: 0.00 ± 0.02
+
+  After tSNR filtering:
+    ses-01: 106 features remaining
+    ses-02: 107 features remaining
+    ses-03: 108 features remaining
+    ses-04: 108 features remaining
+    ses-05: 109 features remaining
+    ses-06: 109 features remaining
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Total tasks: 240
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 240/240 [10:20<00:00,  2.58s/it]
+
+  Completed in 620.8s (2.59s per run)
+  Success: 240, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 240
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.000 [-0.065, 0.105]
+    F = 1.00, p = 0.4796
+  switch_rate:
+    ICC(2,1) = -0.000 [-0.065, 0.105]
+    F = 1.00, p = 0.4796
+  balance:
+    ICC(2,1) = -0.005 [-0.068, 0.098]
+    F = 0.97, p = 0.5280
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0589, p = 0.7217, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0589, p = 0.7217
+
+  === Balance vs Creativity ===
+  Pearson r = -0.3194, p = 0.0475
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.1020
+  Quadratic R² = 0.1184
+  Quadratic coefficients: a=4.1575, b=-3.1683, c=0.3316
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = -0.1181, p = 0.4681, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Kong
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: Yes (±2.0SD)
+  Motion filtering: No
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 6.0 ± 0.0
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 43.9 ± 4.7
+  Switch rate: 19.69 ± 2.09 per 100 windows
+  Balance: 0.1718 ± 0.1470
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.000 (Poor)
+  switch_rate: ICC = -0.000 (Poor)
+  balance: ICC = -0.005 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.059, p=0.7217
+
+Processing time: 620.8s (2.59s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Kong_ROI
+======================================================================
+
+
+######################################################################
+# Analyzing: Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Kong_ROI
+######################################################################
+======================================================================
+Dynamic Functional Analysis: Kong - ROI Level
+Replicating: Chen et al. (2025) Communications Biology
+Data format: Individualized parcellation
+======================================================================
+
+Configuration:
+  Parallel jobs: 23
+  Louvain iterations per timepoint: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+    (Using agreement_weighted + consensus_und)
+  K-means n_init: 100
+  Skip frames: 5
+  tSNR filtering: ENABLED
+  Motion filtering: ENABLED
+    Excluded sessions: 22
+
+[1/6] Loading data by session from Kong/ROI...
+  Found 6 sessions: ['ses-01', 'ses-02', 'ses-03', 'ses-04', 'ses-05', 'ses-06']
+    ses-01: 40 subjects, 242 timepoints, 113 features
+    ses-02: 40 subjects, 242 timepoints, 113 features
+    ses-03: 40 subjects, 242 timepoints, 113 features
+    ses-04: 40 subjects, 242 timepoints, 113 features
+    ses-05: 40 subjects, 242 timepoints, 113 features
+    ses-06: 40 subjects, 242 timepoints, 113 features
+
+  Skipping first 5 frames from each session...
+  After skipping 5 frames:
+    ses-01: 237 timepoints remaining
+    ses-02: 237 timepoints remaining
+    ses-03: 237 timepoints remaining
+    ses-04: 237 timepoints remaining
+    ses-05: 237 timepoints remaining
+    ses-06: 237 timepoints remaining
+  Behavior data: 40 subjects
+  ROIs: 59 DMN + 54 ECN = 113 total
+
+[1.5/6] Applying tSNR filtering (threshold: ±2.0SD)...
+
+  Computing tSNR for each session...
+    ses-01: 7/113 features excluded (6.2%)
+    ses-02: 6/113 features excluded (5.3%)
+    ses-03: 5/113 features excluded (4.4%)
+    ses-04: 5/113 features excluded (4.4%)
+    ses-05: 4/113 features excluded (3.5%)
+    ses-06: 4/113 features excluded (3.5%)
+
+  Global tSNR statistics:
+    Mean ± SD: 0.00 ± 0.02
+
+  After tSNR filtering:
+    ses-01: 106 features remaining
+    ses-02: 107 features remaining
+    ses-03: 108 features remaining
+    ses-04: 108 features remaining
+    ses-05: 109 features remaining
+    ses-06: 109 features remaining
+
+[2/6] Warming up JIT compilation...
+  JIT warmup complete
+
+[3/6] Processing all subjects by session (parallel)...
+  Parameters: window=14, direction=1, trim=1, n_init=100, n_louvain_iter=500
+  Consensus params: tau=0.1, reps=500
+  Motion filtering: 22 session-runs excluded
+  Total tasks: 218
+  Running with 23 parallel workers...
+  Processing: 100%|██████████████████████████████████████████████████████████████████| 218/218 [09:25<00:00,  2.59s/it]
+
+  Completed in 566.1s (2.60s per run)
+  Success: 218, Errors: 0
+
+[4/6] Aggregating results...
+  Total valid session-runs: 218
+  Unique subjects: 40
+  Matched with behavior: 40 subjects
+
+[5/6] Computing ICC (test-retest reliability)...
+  switch_count:
+    ICC(2,1) = -0.010 [-0.084, 0.130]
+    F = 0.94, p = 0.5456
+  switch_rate:
+    ICC(2,1) = -0.010 [-0.084, 0.130]
+    F = 0.94, p = 0.5456
+  balance:
+    ICC(2,1) = -0.005 [-0.081, 0.137]
+    F = 0.97, p = 0.5075
+
+[6/6] Statistical analysis...
+
+  === Switch Count vs Creativity ===
+  Pearson r = 0.0067, p = 0.9678, N = 39
+
+  === Switch Rate vs Creativity ===
+  Pearson r = 0.0067, p = 0.9678
+
+  === Balance vs Creativity ===
+  Pearson r = -0.2044, p = 0.2120
+
+  === Quadratic Relationship (Balance vs Creativity) ===
+  Linear R² = 0.0418
+  Quadratic R² = 0.0615
+  Quadratic coefficients: a=-3.7523, b=-0.2213, c=0.2287
+  → Inverted-U shape detected (negative quadratic term)
+
+  === Switch Frequency vs Intelligence ===
+  Pearson r = -0.2030, p = 0.2090, N = 40
+
+======================================================================
+Saving results...
+  Saved: dynamic_results_by_session.csv
+  Saved: dynamic_results_subject_mean.csv
+  Saved: statistics.json
+  Saved: Trady_results_mtd.mat
+
+======================================================================
+SUMMARY
+======================================================================
+
+Configuration:
+  Space: Kong
+  Level: ROI (ROI)
+  Louvain iterations: 500
+    Consensus tau: 0.1
+    Consensus reps: 500
+  K-means n_init: 100
+  tSNR filtering: Yes (±2.0SD)
+  Motion filtering: Yes
+
+Dataset:
+  Total subjects: 40
+  Sessions per subject: 5.5 ± 0.8
+  Time windows per session: 223
+
+Dynamic indices (subject means ± SD):
+  Switch count: 44.2 ± 4.9
+  Switch rate: 19.81 ± 2.21 per 100 windows
+  Balance: 0.1610 ± 0.1702
+
+ICC (test-retest reliability):
+  switch_count: ICC = -0.010 (Poor)
+  switch_rate: ICC = -0.010 (Poor)
+  balance: ICC = -0.005 (Poor)
+
+Key findings:
+  Switch-Creativity correlation: r=0.007, p=0.9678
+
+Processing time: 566.1s (2.60s per subject-session)
+
+Output saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Kong_ROI
+======================================================================
+
+
+======================================================================
+FINAL SUMMARY - All Pipelines
+======================================================================
+
+✓ Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Schaefer_ROI
+    Time: 587.4s
+    Switch-Creativity: r=-0.0002, p=0.9990
+
+✓ Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Schaefer_ROI
+    Time: 544.9s
+    Switch-Creativity: r=0.0636, p=0.7006
+
+✓ Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Schaefer_ROI
+    Time: 544.4s
+    Switch-Creativity: r=0.0402, p=0.8079
+
+✓ Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Schaefer_ROI
+    Time: 496.1s
+    Switch-Creativity: r=0.0360, p=0.8276
+
+✓ Louv500_tau0.1_reps500_Kmns100_noMotion_notSNR_Kong_ROI
+    Time: 683.4s
+    Switch-Creativity: r=0.0741, p=0.6541
+
+✓ Louv500_tau0.1_reps500_Kmns100_yesMotion_notSNR_Kong_ROI
+    Time: 623.4s
+    Switch-Creativity: r=0.1280, p=0.4373
+
+✓ Louv500_tau0.1_reps500_Kmns100_noMotion_yestSNR_Kong_ROI
+    Time: 621.1s
+    Switch-Creativity: r=0.0589, p=0.7217
+
+✓ Louv500_tau0.1_reps500_Kmns100_yesMotion_yestSNR_Kong_ROI
+    Time: 566.3s
+    Switch-Creativity: r=0.0067, p=0.9678
+
+Output directory: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis
+======================================================================
+
+Log saved to: C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis\output_log_20260108_223703.txt
+
+C:\Users\Boletu\Desktop\25T4\deepprep_output\Methods>

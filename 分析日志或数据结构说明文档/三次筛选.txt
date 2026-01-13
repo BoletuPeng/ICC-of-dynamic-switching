@@ -1,0 +1,177 @@
+deepprep_output/
+├── BOLD
+│   ├── sub-001
+│   │   ├── anat
+│   │   │   ├── sub-001_desc-brain_mask.nii.gz
+│   │   │   ├── sub-001_desc-preproc_T1w.nii.gz
+│   │   │   ├── sub-001_dseg.nii.gz
+│   │   │   ├── sub-001_from-T1w_to-MNI152NLin6Asym_desc-joint_trans.nii.gz
+│   │   │   ├── sub-001_from-fsnative_to-T1w_mode-image_xfm.txt
+│   │   │   ├── sub-001_label-*_probseg.nii.gz (including -CSF_, -GM_, -WM_)
+│   │   │   ├── sub-001_space-MNI152NLin6Asym_res-02_desc-noskull_T1w.nii.gz
+│   │   │   ├── sub-001_space-MNI152NLin6Asym_res-02_desc-skull_T1w.nii.gz
+│   │   │   ├── sub-001_space-T1w_res-2mm_desc-noskull_T1w.nii.gz
+│   │   │   └── sub-001_space-T1w_res-2mm_desc-skull_T1w.nii.gz
+│   │   ├── figures
+│   │   │   ……（files of svg and html for QC）
+│   │   ├── ses-01
+│   │   │   └── func
+│   │   │       ├── sub-001_ses-01_task-rest_bold_mcf.nii.gz.par
+│   │   │       ├── sub-001_ses-01_task-rest_bold_mcf.nii.gz_abs.rms
+│   │   │       ├── sub-001_ses-01_task-rest_bold_mcf.nii.gz_rel.rms
+│   │   │       ├── sub-001_ses-01_task-rest_desc-confounds_timeseries.json
+│   │   │       ├── sub-001_ses-01_task-rest_desc-confounds_timeseries.tsv
+│   │   │       ├── sub-001_ses-01_task-rest_desc-coreg_boldref.json
+│   │   │       ├── sub-001_ses-01_task-rest_desc-coreg_boldref.nii.gz
+│   │   │       ├── sub-001_ses-01_task-rest_desc-hmc_boldref.json
+│   │   │       ├── sub-001_ses-01_task-rest_desc-hmc_boldref.nii.gz
+│   │   │       ├── sub-001_ses-01_task-rest_from-boldref_to-T1w_mode-image_desc-coreg_xfm.json
+│   │   │       ├── sub-001_ses-01_task-rest_from-boldref_to-T1w_mode-image_desc-coreg_xfm.txt
+│   │   │       ├── sub-001_ses-01_task-rest_from-orig_to-boldref_mode-image_desc-hmc_xfm.json
+│   │   │       ├── sub-001_ses-01_task-rest_from-orig_to-boldref_mode-image_desc-hmc_xfm.txt
+│   │   │       ├── sub-001_ses-01_task-rest_hemi-L_space-fsaverage6_bold.func.gii
+│   │   │       ├── sub-001_ses-01_task-rest_hemi-L_space-fsaverage6_bold.json
+│   │   │       ├── sub-001_ses-01_task-rest_hemi-R_space-fsaverage6_bold.func.gii
+│   │   │       ├── sub-001_ses-01_task-rest_hemi-R_space-fsaverage6_bold.json
+│   │   │       ……(*_space-MNI152NLin6Asym_res-02_ things)
+│   │   │       ……(*_space-T1w_ things)
+│   │   ├── ses-02
+│   │   │   └── func
+│   │   │       …………
+│   │   ……（一直到ses-06,对每个subject都是如此，都有6 sessions）
+│   │
+│   │
+│   ├── sub-002
+│   │   ├── …………
+│   │   …………
+│   │
+│  ……（一直到sub-044，共40个被试，其中有几个编号被跳过了，例如sub-014）
+│   │
+│   └── dataset_description.json
+│
+├── QC
+│   ├── sub-001
+│   │   ├── figures
+│   │   │   ……
+│   │   ├── logs
+│   │   │   └── CITATION.html
+│   │   └── sub-001.html
+│   ├── sub-002
+│   │   ├── figures
+│   │   …………
+│   │
+│   ……（同样，共40个被试）
+│   │
+│   ├── dataset_description.json
+│   ├── nextflow.run.command
+│   ├── nextflow.run.config
+│   ├── report.html
+│   └── timeline.html
+│
+├── Recon
+│   ├── fsaverage
+│   │   ……
+│   ├── fsaverage6
+│   │   ……
+│   ├── sub-001
+│   │   ├── label
+│   │   │   ├── aparc.annot.ctab
+│   │   │   ├── lh.aparc.annot
+│   │   │   ├── lh.cortex+hipamyg.label
+│   │   │   ├── lh.cortex.label
+│   │   │   ├── rh.aparc.annot
+│   │   │   ├── rh.cortex+hipamyg.label
+│   │   │   └── rh.cortex.label
+│   │   ├── mri
+│   │   │   ├── orig
+│   │   │   │   └── 001.mgz
+│   │   │   ├── transforms
+│   │   │   │   ……
+│   │   │   ……（rawavg, orig_nu, ……）
+│   │   │   ├── aparc+aseg.mgz
+│   │   │   ├── aparc.DKTatlas+aseg.deep.mgz
+│   │   │   ├── aparc.DKTatlas+aseg.deep.withCC.mgz
+│   │   │   ├── aseg.mgz
+│   │   │   ├── lh.ribbon.mgz
+│   │   │   ├── lh_levelset.nii.gz
+│   │   │   ├── mask.mgz
+│   │   │   ├── orig.mgz
+│   │   │   ├── rh.ribbon.mgz
+│   │   │   ├── rh_levelset.nii.gz
+│   │   │   ├── ribbon.mgz
+│   │   │   ├── wm.asegedit.mgz
+│   │   │   ├── 
+│   │   │   └── 
+│   │   ├── scripts
+│   │   │   ……
+│   │   ├── stats
+│   │   │   ……
+│   │   ├── surf
+│   │   │   ├── autodet.gw.stats.lh.dat
+│   │   │   ├── lh.area
+│   │   │   ├── lh.area.mid
+│   │   │   ├── lh.area.pial
+│   │   │   ├── lh.curv
+│   │   │   ├── lh.curv.pial
+│   │   │   ├── lh.inflated
+│   │   │   ├── lh.jacobian_white
+│   │   │   ├── lh.orig
+│   │   │   ├── lh.orig.premesh
+│   │   │   ├── lh.pial
+│   │   │   ├── lh.pial.T1
+│   │   │   ├── lh.smoothwm
+│   │   │   ……（lh.smoothwm.*.crv）
+│   │   │   ├── lh.sphere
+│   │   │   ├── lh.sphere.reg
+│   │   │   ├── lh.sulc
+│   │   │   ├── lh.thickness
+│   │   │   ├── lh.volume
+│   │   │   ├── lh.w-g.pct.mgh
+│   │   │   ├── lh.white
+│   │   │   ├── lh.white.preaparc
+│   │   │   ……（same for rh）
+│   │   ├── tmp
+│   │   │   ……
+│   │   ├── touch
+│   │   │   ……
+│   │   └── trash
+│   └── sub-002
+│       ├── ……
+│       ……
+│
+└── WorkDir/ [12 items]
+
+
+
+deepprep_output/postproc/BOLD_skipped/
+├── sub-001
+│   ├── ses-01
+│   │   └── func
+│   │       ├── sub-001_ses-01_task-rest_hemi-L_space-fsaverage6_desc-regression_bold.json
+│   │       ├── sub-001_ses-01_task-rest_hemi-L_space-fsaverage6_desc-regression_bold.nii.gz
+│   │       ├── sub-001_ses-01_task-rest_hemi-R_space-fsaverage6_desc-regression_bold.json
+│   │       └── sub-001_ses-01_task-rest_hemi-R_space-fsaverage6_desc-regression_bold.nii.gz
+│   ├── ses-02
+│   │   └── func
+│   │       └── sub-001_ses-02_task-rest_*（完全一致）
+│   ├── ses-03
+│   │   └── func
+│   │       …… (同上，4个文件，前缀为 sub-001_ses-03_)
+│   ├── ses-04
+│   │   └── func
+│   │       …… (同上，4个文件，前缀为 sub-001_ses-04_)
+│   ├── ses-05
+│   │   └── func
+│   │       …… (同上，4个文件，前缀为 sub-001_ses-05_)
+│   └── ses-06
+│       └── func
+│           …… (同上，4个文件，前缀为 sub-001_ses-06_)
+│
+├── sub-002
+│   ├── ses-01
+│   │   └── func
+│   │       …… (4个文件，前缀为 sub-002_ses-01_)
+│   │
+│   …… (一直到 ses-06，结构同 sub-001)
+│
+…… (sub-003 到 sub-043，缺失014 015 018 034，结构相同，共计40个被试，每人6 sessions)

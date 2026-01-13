@@ -1,0 +1,82 @@
+D:\D\Back\fMRI\deepprep_output\Analysis>python extract_roi_timeseries_v2.py ^
+More?     --bold_dir "D:/D/Back/fMRI/deepprep_output/postproc/BOLD" ^
+More?     --atlas_dir "D:/D/Back/fMRI/deepprep_output/Analysis/Atlas" ^
+More?     --output_dir "D:/D/Back/fMRI/analysis_output/roi_timeseries" ^
+More?     --desc regression
+======================================================================
+ROI Timeseries Extraction v2
+======================================================================
+
+[1/6] Loading fsaverage6 Schaefer300 17Networks parcellation...
+  LH annot: D:/D/Back/fMRI/deepprep_output/Analysis/Atlas\lh.Schaefer2018_300Parcels_17Networks_order.annot
+  RH annot: D:/D/Back/fMRI/deepprep_output/Analysis/Atlas\rh.Schaefer2018_300Parcels_17Networks_order.annot
+  LH parcels: 151, RH parcels: 151
+  LH vertices: 40962, RH vertices: 40962
+
+  Selecting DMN and ECN parcels (fsaverage6)...
+    DMN parcels: 58
+    ECN parcels: 48
+    Total: 106 parcels
+    Selected vertices: LH=13641, RH=12023, Total=25664
+
+[2/6] Loading MNI Schaefer300 17Networks atlas...
+  MNI atlas: D:/D/Back/fMRI/deepprep_output/Analysis/Atlas\Schaefer2018_300Parcels_17Networks_order_FSLMNI152_2mm.nii.gz
+  Atlas shape: (91, 109, 91)
+  Total parcels in atlas: 300
+  Selecting DMN and ECN parcels (MNI)...
+    DMN parcels: 58
+    ECN parcels: 48
+    Total: 106 parcels
+    Selected voxels: 50012
+
+[3/6] Saving ROI metadata...
+  Saved: D:/D/Back/fMRI/analysis_output/roi_timeseries\roi_info.json
+
+[4/6] Scanning subjects...
+  Found 40 subjects
+
+[5/6] Extracting fsaverage6 timeseries (parallel with 8 workers)...
+  Total tasks: 240 (subjects × sessions)
+  Progress: 240/240 | sub-044 ses-06 (ROI:106)
+  Completed 240 tasks
+  Saving fsaverage6 ROI data...
+    Saved 40 subjects
+  Saving fsaverage6 vertex data...
+    Saved 40 subjects
+
+[6/6] Extracting MNI timeseries (parallel with 8 workers)...
+  Total tasks: 240 (subjects × sessions)
+  Progress: 240/240 | sub-044 ses-05 (ROI:106)
+  Completed 240 tasks
+  Saving MNI ROI data...
+    Saved 40 subjects
+  Saving MNI voxel data...
+    Saved 40 subjects
+
+======================================================================
+EXTRACTION COMPLETE!
+======================================================================
+
+Output directory: D:/D/Back/fMRI/analysis_output/roi_timeseries
+
+fsaverage6 space:
+  ROI level: 106 parcels (DMN: 58, ECN: 48)
+  Vertex level: 25664 vertices
+
+MNI space:
+  ROI level: 106 parcels (DMN: 58, ECN: 48)
+  Voxel level: 50012 voxels
+
+Total subjects processed: 40
+
+Directory structure:
+  D:/D/Back/fMRI/analysis_output/roi_timeseries/
+  ├── fsaverage6/
+  │   ├── ROI/           # 106 ROIs × 40 subjects
+  │   └── Vox_Vert/      # 25664 vertices × 40 subjects
+  ├── MNI/
+  │   ├── ROI/           # 106 ROIs × 40 subjects
+  │   └── Vox_Vert/      # 50012 voxels × 40 subjects
+  └── roi_info.json
+
+D:\D\Back\fMRI\deepprep_output\Analysis>

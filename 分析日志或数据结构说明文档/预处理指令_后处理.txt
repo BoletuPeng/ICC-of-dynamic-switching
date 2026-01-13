@@ -1,0 +1,43 @@
+Microsoft Windows [版本 10.0.26100.7462]
+(c) Microsoft Corporation。保留所有权利。
+
+C:\Windows\System32>docker run -it --rm --gpus all ^
+More?   -v "D:\D\Back\fMRI\bids_dataset:/input" ^
+More?   -v "D:\D\Back\fMRI\deepprep_output:/output" ^
+More?   -v "C:\Users\Boletu\Downloads\license.txt:/fs_license.txt" ^
+More?   -v "D:\D\Back\fMRI\deepprep_output\motion_analysis\confoundlist.txt:/confoundlist.txt" ^
+More?   --entrypoint /bin/bash ^
+More?   deepprep:25.1.0-rtx5090-v11
+(deepprep) root@03a390c4ea00:~# postprocess /output/BOLD /output/postproc participant \
+  --fs_license_file /fs_license.txt \
+  --confounds_index_file /confoundlist.txt \
+  --task_id 'rest' \
+  --space 'MNI152NLin6Asym fsaverage6' \
+  --skip_frame 5
+bash: postprocess: command not found
+
+(deepprep) root@03a390c4ea00:~# bash /opt/DeepPrep/deepprep/web/pages/postprocess.sh \
+  /output/BOLD /output/postproc participant \
+  --fs_license_file /fs_license.txt \
+  --confounds_index_file /confoundlist.txt \
+  --task_id rest \
+  --space 'MNI152NLin6Asym fsaverage6' \
+  --skip_frame 5 \
+  --surface_fwhm 0 \
+  --volume_fwhm 0 \
+  --bandpass '0.001-9999'
+INFO: args: /output/BOLD /output/postproc participant --fs_license_file /fs_license.txt --confounds_index_file /confoundlist.txt --task_id rest --space MNI152NLin6Asym fsaverage6 --skip_frame 5 --surface_fwhm 0 --volume_fwhm 0 --bandpass 0.001-9999
+Input --fs_license_file : /fs_license.txt
+FREESURFER_HOME is set to: /opt/freesurfer
+INFO: existed nextflow WorkDir: /output/postproc/WorkDir/nextflow
+INFO: run_config : /output/postproc/WorkDir/nextflow/run.config
+
+ N E X T F L O W   ~  version 24.10.3
+
+Launching `/opt/DeepPrep/deepprep/rest/denoise/postprocess.nf` [desperate_jang] DSL2 - revision: 3cfde202c8
+
+executor >  local (207)
+[6e/4904ce] bold_get_preproc_bold_file                                                            [100%] 1 of 1 ✔
+[7e/9f58c6] bold_postprocess (sub-012_ses-03_task-rest_hemi-L_space-fsaverage6)                   [ 28%] 203 of 720
+
+

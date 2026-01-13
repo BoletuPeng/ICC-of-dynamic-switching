@@ -1,0 +1,12 @@
+D:\D\Back\fMRI\deepprep_output\Behavior
+
+| 文件名 | 列 | 典型值 |
+|--------|-----|--------|
+| **Demographic_Name_index_GenderMale1Female2_Age_HandRight2Left1.xlsx** | 姓名, 编号, 性别, 年龄, 利手, 民族 | 编号1-114; 性别(男1女2); 年龄18-24岁(M=18.7); 利手(右2左1); 民族(汉/汉族) |
+| **BigFive_Name_N_E_O_A_C.xlsx** | 姓名, N, E, O, A, C | 大五人格分数 (N=26-33, E=34-50, O=35-51, A=30-42, C=41-56) |
+| **CAchievQ_Name_Raw_Log.xlsx** | 姓名, 总分, log_总分 | 创造成就原始分(3-19)及对数转换(1.39-3.00) |
+| **CBQ_Name_Total.xlsx** | 姓名, 总分 | 创造行为问卷总分(14-24) |
+| **Raven_Name_Score.xlsx** | 姓名, 总分 | 瑞文推理分数(23-28) |
+| **subject_id_name_mapping.txt** | 被试编号, 姓名 | 如('001','李雨恒')，40人 |
+
+**样本**: 112人，年龄18-24岁(M=18.7)，女性占77.7%，右利手为主。

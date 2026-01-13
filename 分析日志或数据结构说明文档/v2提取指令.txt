@@ -1,0 +1,5 @@
+python extract_roi_timeseries_v2.py ^
+    --bold_dir "D:/D/Back/fMRI/deepprep_output/postproc/BOLD" ^
+    --atlas_dir "D:/D/Back/fMRI/deepprep_output/Analysis/Atlas" ^
+    --output_dir "D:/D/Back/fMRI/analysis_output/roi_timeseries" ^
+    --desc regression

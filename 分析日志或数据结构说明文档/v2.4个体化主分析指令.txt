@@ -1,0 +1,13 @@
+python run_dynamic_analysis_by_session_parallel_v2.4_individualized.py ^
+    --roi_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized" ^
+    --behavior_file "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output/behavior/behavior_data.csv" ^
+    --methods_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/Methods" ^
+    --output_dir "C:/Users/Boletu/Desktop/25T4/deepprep_output/analysis_output_individualized/dynamic_analysis" ^
+    --level ROI ^
+    --Louv 500 ^
+    --LouvTau 0.1 ^
+    --LouvReps 500 ^
+    --Kmns 100 ^
+    --tSNR --tSNR_threshold 2.0 ^
+    --Motion --motion_file "C:/Users/Boletu/Desktop/25T4/deepprep_output/motion_analysis/excluded_sessions.txt" ^
+    --n_jobs 23
