@@ -214,7 +214,7 @@ def coupling_optimized(data, window, direction=0, trim=0, parallel=True):
             trim_end = ts - trim_amount
             mtd = mtd[:, :, trim_start:trim_end]
         else:
-            mtd = mtd[:, :, :ts - window]
+            mtd = mtd[:, :, :ts - window -1]
     
     return mtd
 
