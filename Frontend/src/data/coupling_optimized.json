@@ -1,0 +1,68 @@
+{
+  "id": "coupling_optimized",
+  "name": "MTD Coupling",
+  "description": "Compute Multiplication of Temporal Derivatives (MTD) for time-resolved functional connectivity",
+  "category": "connectivity",
+  "color": "#3b82f6",
+  "icon": "activity",
+  "inputs": [
+    {
+      "id": "data",
+      "name": "Time Series Data",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_nodes"],
+      "description": "ROI time series data [TIME × NODES]"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "mtd",
+      "name": "MTD Connectivity",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes", "n_timepoints"],
+      "description": "Time-varying connectivity matrix [NODES × NODES × TIME]"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "window",
+      "name": "Window Size",
+      "type": "int",
+      "default": 14,
+      "min": 3,
+      "max": 50,
+      "description": "Smoothing window size for moving average (in TRs)"
+    },
+    {
+      "id": "direction",
+      "name": "Window Direction",
+      "type": "select",
+      "options": [
+        {"value": 0, "label": "Middle (centered)"},
+        {"value": 1, "label": "Forward facing"}
+      ],
+      "default": 0,
+      "description": "Direction of the smoothing window"
+    },
+    {
+      "id": "trim",
+      "name": "Trim Zeros",
+      "type": "select",
+      "options": [
+        {"value": 0, "label": "No trim"},
+        {"value": 1, "label": "Trim ends"}
+      ],
+      "default": 0,
+      "description": "Whether to trim zero-padded ends"
+    },
+    {
+      "id": "parallel",
+      "name": "Parallel Processing",
+      "type": "boolean",
+      "default": true,
+      "description": "Enable parallel computation"
+    }
+  ]
+}

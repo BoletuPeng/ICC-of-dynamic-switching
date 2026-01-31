@@ -1,0 +1,46 @@
+{
+  "id": "extract_dmn_ecn",
+  "name": "Extract DMN/ECN",
+  "description": "Extract Default Mode Network and Executive Control Network regions from ROI time series",
+  "category": "preprocessing",
+  "color": "#10b981",
+  "icon": "filter",
+  "inputs": [
+    {
+      "id": "roi_timeseries",
+      "name": "ROI Time Series",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_rois"],
+      "description": "Full ROI time series (e.g., 300 parcels)"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "dmn_ecn_timeseries",
+      "name": "DMN/ECN Time Series",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "106"],
+      "description": "Filtered time series containing only DMN (58) and ECN (48) regions"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "dmn_indices",
+      "name": "DMN Indices",
+      "type": "array",
+      "dtype": "int32",
+      "default": "auto",
+      "description": "Indices of DMN regions (auto-detected from Schaefer atlas)"
+    },
+    {
+      "id": "ecn_indices",
+      "name": "ECN Indices",
+      "type": "array",
+      "dtype": "int32",
+      "default": "auto",
+      "description": "Indices of ECN regions (auto-detected from Schaefer atlas)"
+    }
+  ]
+}

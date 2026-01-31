@@ -1,0 +1,56 @@
+{
+  "id": "tsnr_optimized",
+  "name": "Temporal SNR Filter",
+  "description": "Calculate temporal signal-to-noise ratio and filter ROIs based on deviation from mean",
+  "category": "preprocessing",
+  "color": "#10b981",
+  "icon": "sliders",
+  "inputs": [
+    {
+      "id": "data",
+      "name": "Time Series Data",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_features"],
+      "description": "Time series data to filter"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "filtered_data",
+      "name": "Filtered Data",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_valid_features"],
+      "description": "Filtered time series with outlier ROIs removed"
+    },
+    {
+      "id": "tsnr",
+      "name": "tSNR Values",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_features"],
+      "description": "Temporal SNR for each feature (mean/std)"
+    },
+    {
+      "id": "mask",
+      "name": "Valid Mask",
+      "type": "ndarray",
+      "dtype": "bool",
+      "shape": ["n_features"],
+      "description": "Boolean mask of valid features"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "threshold_sd",
+      "name": "Threshold (SD)",
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": 5.0,
+      "step": 0.1,
+      "description": "Number of standard deviations for outlier threshold"
+    }
+  ]
+}
