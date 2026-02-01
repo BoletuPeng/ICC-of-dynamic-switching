@@ -1,0 +1,61 @@
+{
+  "id": "cartographic_profile_optimized",
+  "name": "Cartographic Profile",
+  "description": "Create 2D histogram of nodes in participation coefficient × module degree z-score space",
+  "category": "analysis",
+  "color": "#ec4899",
+  "icon": "grid",
+  "inputs": [
+    {
+      "id": "BT",
+      "name": "Participation Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_timepoints"],
+      "description": "Participation coefficient matrix [NODES × TIME], range [0, 1]"
+    },
+    {
+      "id": "WT",
+      "name": "Z-Score Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_timepoints"],
+      "description": "Module degree z-score matrix [NODES × TIME], range ≈ [-5, 5]"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "CP",
+      "name": "Cartographic Profile",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": [101, 101, "n_timepoints"],
+      "description": "2D histogram for each timepoint"
+    },
+    {
+      "id": "xbins",
+      "name": "X Bins",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": [101],
+      "description": "Participation coefficient bin edges (0.0 to 1.0)"
+    },
+    {
+      "id": "ybins",
+      "name": "Y Bins",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": [101],
+      "description": "Module degree z-score bin edges (5.0 to -5.0)"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "parallel",
+      "name": "Parallel Processing",
+      "type": "boolean",
+      "default": true,
+      "description": "Enable parallel computation across timepoints"
+    }
+  ]
+}

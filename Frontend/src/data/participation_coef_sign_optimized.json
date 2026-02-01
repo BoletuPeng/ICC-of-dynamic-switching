@@ -1,0 +1,53 @@
+{
+  "id": "participation_coef_sign_optimized",
+  "name": "Participation Coefficient",
+  "description": "Measure diversity of intermodular connections for each node",
+  "category": "metrics",
+  "color": "#f59e0b",
+  "icon": "share-2",
+  "inputs": [
+    {
+      "id": "W",
+      "name": "Weight Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes"],
+      "description": "Connection matrix with positive/negative weights"
+    },
+    {
+      "id": "Ci",
+      "name": "Community Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_nodes"],
+      "description": "Community affiliation vector (1-indexed)"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "Ppos",
+      "name": "Positive Participation",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes"],
+      "description": "Participation coefficient from positive weights"
+    },
+    {
+      "id": "Pneg",
+      "name": "Negative Participation",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes"],
+      "description": "Participation coefficient from negative weights"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "parallel",
+      "name": "Parallel Processing",
+      "type": "boolean",
+      "default": false,
+      "description": "Enable parallel computation across communities"
+    }
+  ]
+}

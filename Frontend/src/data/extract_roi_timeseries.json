@@ -1,0 +1,62 @@
+{
+  "id": "extract_roi_timeseries",
+  "name": "Extract ROI Time Series",
+  "description": "Extract time series from preprocessed fMRI data using brain atlas parcellation",
+  "category": "preprocessing",
+  "color": "#10b981",
+  "icon": "brain",
+  "inputs": [
+    {
+      "id": "bold_data",
+      "name": "BOLD Data",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_vertices"],
+      "description": "Preprocessed BOLD fMRI data"
+    },
+    {
+      "id": "atlas",
+      "name": "Atlas Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_vertices"],
+      "description": "Parcellation labels for each vertex/voxel"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "roi_timeseries",
+      "name": "ROI Time Series",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_timepoints", "n_rois"],
+      "description": "Extracted ROI-averaged time series"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "space",
+      "name": "Space",
+      "type": "select",
+      "options": ["fsaverage6", "MNI152"],
+      "default": "fsaverage6",
+      "description": "Coordinate space of the input data"
+    },
+    {
+      "id": "atlas_name",
+      "name": "Atlas Name",
+      "type": "select",
+      "options": ["Schaefer300", "Schaefer400", "Kong300"],
+      "default": "Schaefer300",
+      "description": "Brain parcellation atlas to use"
+    },
+    {
+      "id": "output_level",
+      "name": "Output Level",
+      "type": "select",
+      "options": ["roi", "vertex"],
+      "default": "roi",
+      "description": "Output at ROI or vertex level"
+    }
+  ]
+}

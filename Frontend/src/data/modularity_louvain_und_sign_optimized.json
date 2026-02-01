@@ -1,0 +1,61 @@
+{
+  "id": "modularity_louvain_und_sign_optimized",
+  "name": "Louvain Community Detection",
+  "description": "Louvain algorithm for community detection in undirected networks with positive and negative weights",
+  "category": "community",
+  "color": "#8b5cf6",
+  "icon": "git-branch",
+  "inputs": [
+    {
+      "id": "W",
+      "name": "Weight Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes"],
+      "description": "Symmetric connection matrix with positive/negative weights"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "Ci",
+      "name": "Community Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_nodes"],
+      "description": "Community affiliation vector (1-indexed)"
+    },
+    {
+      "id": "Q",
+      "name": "Modularity",
+      "type": "float",
+      "dtype": "float64",
+      "shape": [],
+      "description": "Modularity value Q"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "qtype",
+      "name": "Modularity Type",
+      "type": "select",
+      "options": [
+        {"value": "sta", "label": "Standard asymmetric"},
+        {"value": "pos", "label": "Positive only"},
+        {"value": "smp", "label": "Simple"},
+        {"value": "gja", "label": "Generalized asymmetric"},
+        {"value": "neg", "label": "Negative only"}
+      ],
+      "default": "sta",
+      "description": "Type of modularity to optimize"
+    },
+    {
+      "id": "seed",
+      "name": "Random Seed",
+      "type": "int",
+      "default": null,
+      "min": 0,
+      "max": 2147483647,
+      "description": "Random seed for reproducibility (null for random)"
+    }
+  ]
+}

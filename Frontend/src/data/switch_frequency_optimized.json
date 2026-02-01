@@ -1,0 +1,37 @@
+{
+  "id": "switch_frequency_optimized",
+  "name": "State Switching Frequency",
+  "description": "Calculate frequency of state transitions between brain states",
+  "category": "output",
+  "color": "#ef4444",
+  "icon": "repeat",
+  "inputs": [
+    {
+      "id": "idx",
+      "name": "State Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_timepoints"],
+      "description": "State labels per timepoint (values 1 or 2)"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "switch_count",
+      "name": "Switch Count",
+      "type": "int",
+      "dtype": "int32",
+      "shape": [],
+      "description": "Total number of state transitions"
+    },
+    {
+      "id": "switch_f",
+      "name": "Switch Flags",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_timepoints-1"],
+      "description": "Adjacent state sums (value=3 indicates switch)"
+    }
+  ],
+  "parameters": []
+}

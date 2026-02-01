@@ -1,0 +1,65 @@
+{
+  "id": "consensus_und_optimized",
+  "name": "Consensus Clustering",
+  "description": "Consensus clustering using iteratively thresholded agreement matrices",
+  "category": "community",
+  "color": "#8b5cf6",
+  "icon": "git-merge",
+  "inputs": [
+    {
+      "id": "d",
+      "name": "Agreement Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes"],
+      "description": "Agreement matrix with values in [0, 1]"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "ciu",
+      "name": "Consensus Partitions",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_nodes", "n_unique_partitions"],
+      "description": "Consensus partition matrix with unique partitions"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "tau",
+      "name": "Threshold",
+      "type": "float",
+      "default": 0.1,
+      "min": 0.0,
+      "max": 1.0,
+      "step": 0.01,
+      "description": "Threshold parameter for agreement matrix"
+    },
+    {
+      "id": "reps",
+      "name": "Louvain Repetitions",
+      "type": "int",
+      "default": 500,
+      "min": 10,
+      "max": 2000,
+      "description": "Number of Louvain algorithm repetitions"
+    },
+    {
+      "id": "seed",
+      "name": "Random Seed",
+      "type": "int",
+      "default": null,
+      "min": 0,
+      "max": 2147483647,
+      "description": "Random seed for reproducibility"
+    },
+    {
+      "id": "verbose",
+      "name": "Verbose Output",
+      "type": "boolean",
+      "default": false,
+      "description": "Print progress information"
+    }
+  ]
+}

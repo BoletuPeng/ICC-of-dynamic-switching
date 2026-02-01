@@ -1,0 +1,82 @@
+{
+  "id": "kmeans_optimized",
+  "name": "K-Means Clustering",
+  "description": "Cluster cartographic profiles into discrete brain states using K-means algorithm",
+  "category": "clustering",
+  "color": "#06b6d4",
+  "icon": "target",
+  "inputs": [
+    {
+      "id": "X",
+      "name": "Feature Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_features", "n_samples"],
+      "description": "Data to cluster (typically flattened cartographic profiles)"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "labels",
+      "name": "Cluster Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_samples"],
+      "description": "Cluster assignments for each sample (0-indexed)"
+    },
+    {
+      "id": "centers",
+      "name": "Cluster Centers",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_clusters", "n_features"],
+      "description": "Centroid of each cluster"
+    },
+    {
+      "id": "inertia",
+      "name": "Inertia",
+      "type": "float",
+      "dtype": "float64",
+      "shape": [],
+      "description": "Sum of squared distances to nearest centroid"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "n_clusters",
+      "name": "Number of Clusters",
+      "type": "int",
+      "default": 2,
+      "min": 2,
+      "max": 10,
+      "description": "Number of clusters (brain states) to identify"
+    },
+    {
+      "id": "n_init",
+      "name": "Initializations",
+      "type": "int",
+      "default": 100,
+      "min": 1,
+      "max": 500,
+      "description": "Number of random initializations"
+    },
+    {
+      "id": "max_iter",
+      "name": "Max Iterations",
+      "type": "int",
+      "default": 300,
+      "min": 50,
+      "max": 1000,
+      "description": "Maximum iterations per initialization"
+    },
+    {
+      "id": "random_state",
+      "name": "Random State",
+      "type": "int",
+      "default": null,
+      "min": 0,
+      "max": 2147483647,
+      "description": "Random seed for reproducibility"
+    }
+  ]
+}

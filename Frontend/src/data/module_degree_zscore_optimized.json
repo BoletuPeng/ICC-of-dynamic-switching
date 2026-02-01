@@ -1,0 +1,51 @@
+{
+  "id": "module_degree_zscore_optimized",
+  "name": "Module Degree Z-Score",
+  "description": "Compute within-module degree centrality normalized by community statistics",
+  "category": "metrics",
+  "color": "#f59e0b",
+  "icon": "bar-chart-2",
+  "inputs": [
+    {
+      "id": "W",
+      "name": "Weight Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes"],
+      "description": "Connection matrix"
+    },
+    {
+      "id": "Ci",
+      "name": "Community Labels",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_nodes"],
+      "description": "Community affiliation vector (1-indexed)"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "Z",
+      "name": "Z-Scores",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes"],
+      "description": "Within-module z-score for each node"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "flag",
+      "name": "Degree Type",
+      "type": "select",
+      "options": [
+        {"value": 0, "label": "Undirected"},
+        {"value": 1, "label": "Out-degree"},
+        {"value": 2, "label": "In-degree"},
+        {"value": 3, "label": "Both directions"}
+      ],
+      "default": 0,
+      "description": "Type of degree calculation"
+    }
+  ]
+}

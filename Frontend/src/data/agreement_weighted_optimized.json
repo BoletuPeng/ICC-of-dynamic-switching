@@ -1,0 +1,45 @@
+{
+  "id": "agreement_weighted_optimized",
+  "name": "Weighted Agreement Matrix",
+  "description": "Compute weighted agreement matrix across multiple community partitions",
+  "category": "community",
+  "color": "#8b5cf6",
+  "icon": "layers",
+  "inputs": [
+    {
+      "id": "CI",
+      "name": "Partition Matrix",
+      "type": "ndarray",
+      "dtype": "int32",
+      "shape": ["n_nodes", "n_partitions"],
+      "description": "N × M matrix of community partitions"
+    },
+    {
+      "id": "Wts",
+      "name": "Weights",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_partitions"],
+      "description": "Weight vector for each partition"
+    }
+  ],
+  "outputs": [
+    {
+      "id": "D",
+      "name": "Agreement Matrix",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_nodes", "n_nodes"],
+      "description": "Weighted agreement matrix with values in [0, 1]"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "parallel",
+      "name": "Parallel Processing",
+      "type": "boolean",
+      "default": false,
+      "description": "Enable parallel computation for upper triangle"
+    }
+  ]
+}
