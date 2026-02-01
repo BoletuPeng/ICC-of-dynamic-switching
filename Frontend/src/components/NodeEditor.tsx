@@ -1,146 +1,186 @@
-import { useState, useCallback } from 'react';
-import { Icon, X } from './Icons';
-import { nodeDefinitionsMap } from '../data';
-import { usePipelineStore } from '../store/pipelineStore';
-import type { ParameterDefinition, SelectOption, PipelineNode, NodeDefinition } from '../types';
+import { memo, useState, useCallback } from 'react';
+import { X } from 'lucide-react';
+import { Icon } from './Icons';
+import { usePipelineStore, selectEditingNode } from '../store/pipelineStore';
+import type { ParameterDefinition, SelectOption, PipelineNode } from '../types';
+
+// =============================================================================
+// Parameter Input Components
+// =============================================================================
 
 interface ParameterInputProps {
   param: ParameterDefinition;
   value: unknown;
   onChange: (value: unknown) => void;
+  accentColor: string;
 }
 
-function ParameterInput({ param, value, onChange }: ParameterInputProps) {
+const NumberInput = memo(function NumberInput({
+  param,
+  value,
+  onChange,
+  accentColor,
+}: ParameterInputProps) {
   const currentValue = value ?? param.default;
+
+  return (
+    <div className="parameter-field">
+      <label className="parameter-label">{param.name}</label>
+      <input
+        type="number"
+        value={currentValue === null ? '' : String(currentValue)}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val === '') {
+            onChange(null);
+          } else {
+            onChange(param.type === 'int' ? parseInt(val, 10) : parseFloat(val));
+          }
+        }}
+        min={param.min}
+        max={param.max}
+        step={param.step || (param.type === 'float' ? 0.01 : 1)}
+        className="parameter-input"
+        placeholder={param.default === null ? 'null (random)' : undefined}
+        style={{ '--accent-color': accentColor } as React.CSSProperties}
+      />
+      <p className="parameter-description">{param.description}</p>
+    </div>
+  );
+});
+
+const BooleanInput = memo(function BooleanInput({
+  param,
+  value,
+  onChange,
+  accentColor,
+}: ParameterInputProps) {
+  const currentValue = value ?? param.default;
+
+  return (
+    <div className="parameter-field parameter-field-boolean">
+      <div className="parameter-field-boolean-info">
+        <label className="parameter-label">{param.name}</label>
+        <p className="parameter-description">{param.description}</p>
+      </div>
+      <button
+        onClick={() => onChange(!currentValue)}
+        className="parameter-toggle"
+        style={{
+          backgroundColor: currentValue ? accentColor : undefined,
+        }}
+        data-checked={currentValue}
+      >
+        <div className="parameter-toggle-knob" />
+      </button>
+    </div>
+  );
+});
+
+const SelectInput = memo(function SelectInput({
+  param,
+  value,
+  onChange,
+  accentColor,
+}: ParameterInputProps) {
+  const currentValue = value ?? param.default;
+
+  return (
+    <div className="parameter-field">
+      <label className="parameter-label">{param.name}</label>
+      <select
+        value={String(currentValue)}
+        onChange={(e) => {
+          const option = param.options?.find((opt) =>
+            typeof opt === 'object'
+              ? String(opt.value) === e.target.value
+              : String(opt) === e.target.value
+          );
+          if (typeof option === 'object') {
+            onChange((option as SelectOption).value);
+          } else {
+            onChange(option);
+          }
+        }}
+        className="parameter-select"
+        style={{ '--accent-color': accentColor } as React.CSSProperties}
+      >
+        {param.options?.map((option) => {
+          const opt =
+            typeof option === 'object'
+              ? (option as SelectOption)
+              : { value: option, label: option };
+          return (
+            <option key={String(opt.value)} value={String(opt.value)}>
+              {String(opt.label)}
+            </option>
+          );
+        })}
+      </select>
+      <p className="parameter-description">{param.description}</p>
+    </div>
+  );
+});
+
+const TextInput = memo(function TextInput({
+  param,
+  value,
+  onChange,
+  accentColor,
+}: ParameterInputProps) {
+  const currentValue = value ?? param.default;
+
+  return (
+    <div className="parameter-field">
+      <label className="parameter-label">{param.name}</label>
+      <input
+        type="text"
+        value={String(currentValue ?? '')}
+        onChange={(e) => onChange(e.target.value)}
+        className="parameter-input"
+        style={{ '--accent-color': accentColor } as React.CSSProperties}
+      />
+      <p className="parameter-description">{param.description}</p>
+    </div>
+  );
+});
+
+function ParameterInput(props: ParameterInputProps) {
+  const { param } = props;
 
   switch (param.type) {
     case 'int':
     case 'float':
-      return (
-        <div>
-          <label className="block text-sm font-medium text-surface-200 mb-1">
-            {param.name}
-          </label>
-          <input
-            type="number"
-            value={currentValue === null ? '' : String(currentValue)}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === '') {
-                onChange(null);
-              } else {
-                onChange(param.type === 'int' ? parseInt(val, 10) : parseFloat(val));
-              }
-            }}
-            min={param.min}
-            max={param.max}
-            step={param.step || (param.type === 'float' ? 0.01 : 1)}
-            className="w-full px-3 py-2 bg-surface-800 border border-surface-600 rounded-lg
-                       text-surface-100 focus:outline-none focus:ring-2 focus:ring-primary-500
-                       focus:border-transparent transition-all"
-            placeholder={param.default === null ? 'null (random)' : undefined}
-          />
-          <p className="mt-1 text-xs text-surface-400">{param.description}</p>
-        </div>
-      );
-
+      return <NumberInput {...props} />;
     case 'boolean':
-      return (
-        <div className="flex items-center justify-between">
-          <div>
-            <label className="block text-sm font-medium text-surface-200">
-              {param.name}
-            </label>
-            <p className="text-xs text-surface-400">{param.description}</p>
-          </div>
-          <button
-            onClick={() => onChange(!currentValue)}
-            className={`
-              relative w-12 h-6 rounded-full transition-colors
-              ${currentValue ? 'bg-primary-500' : 'bg-surface-600'}
-            `}
-          >
-            <div
-              className={`
-                absolute top-1 w-4 h-4 bg-white rounded-full transition-transform
-                ${currentValue ? 'translate-x-7' : 'translate-x-1'}
-              `}
-            />
-          </button>
-        </div>
-      );
-
+      return <BooleanInput {...props} />;
     case 'select':
-      return (
-        <div>
-          <label className="block text-sm font-medium text-surface-200 mb-1">
-            {param.name}
-          </label>
-          <select
-            value={String(currentValue)}
-            onChange={(e) => {
-              const option = param.options?.find((opt) =>
-                typeof opt === 'object'
-                  ? String(opt.value) === e.target.value
-                  : String(opt) === e.target.value
-              );
-              if (typeof option === 'object') {
-                onChange(option.value);
-              } else {
-                onChange(option);
-              }
-            }}
-            className="w-full px-3 py-2 bg-surface-800 border border-surface-600 rounded-lg
-                       text-surface-100 focus:outline-none focus:ring-2 focus:ring-primary-500
-                       focus:border-transparent transition-all appearance-none cursor-pointer"
-          >
-            {param.options?.map((option) => {
-              const opt = typeof option === 'object' ? option as SelectOption : { value: option, label: option };
-              return (
-                <option key={String(opt.value)} value={String(opt.value)}>
-                  {String(opt.label)}
-                </option>
-              );
-            })}
-          </select>
-          <p className="mt-1 text-xs text-surface-400">{param.description}</p>
-        </div>
-      );
-
+      return <SelectInput {...props} />;
     case 'string':
     case 'array':
-      return (
-        <div>
-          <label className="block text-sm font-medium text-surface-200 mb-1">
-            {param.name}
-          </label>
-          <input
-            type="text"
-            value={String(currentValue ?? '')}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 bg-surface-800 border border-surface-600 rounded-lg
-                       text-surface-100 focus:outline-none focus:ring-2 focus:ring-primary-500
-                       focus:border-transparent transition-all"
-          />
-          <p className="mt-1 text-xs text-surface-400">{param.description}</p>
-        </div>
-      );
-
+      return <TextInput {...props} />;
     default:
       return null;
   }
 }
 
+// =============================================================================
+// Node Editor Content
+// =============================================================================
+
 interface NodeEditorContentProps {
   node: PipelineNode;
-  definition: NodeDefinition;
 }
 
-function NodeEditorContent({ node, definition }: NodeEditorContentProps) {
+const NodeEditorContent = memo(function NodeEditorContent({
+  node,
+}: NodeEditorContentProps) {
   const { setEditingNode, updateNodeParameters } = usePipelineStore();
+  const { data } = node;
 
-  // Initialize state directly from props - component remounts via key when node changes
-  const [localParams, setLocalParams] = useState<Record<string, unknown>>(() => ({ ...node.parameters }));
+  const [localParams, setLocalParams] = useState<Record<string, unknown>>(
+    () => ({ ...data.parameters })
+  );
 
   const handleParamChange = useCallback((paramId: string, value: unknown) => {
     setLocalParams((prev) => ({ ...prev, [paramId]: value }));
@@ -155,107 +195,105 @@ function NodeEditorContent({ node, definition }: NodeEditorContentProps) {
     setEditingNode(null);
   }, [setEditingNode]);
 
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        handleClose();
+      }
+    },
+    [handleClose]
+  );
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
-      onClick={handleClose}
-    >
-      <div
-        className="w-full max-w-lg max-h-[80vh] glass rounded-2xl overflow-hidden shadow-2xl animate-slide-in"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="node-editor-overlay" onClick={handleBackdropClick}>
+      <div className="node-editor-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div
-          className="px-6 py-4 flex items-center gap-3"
-          style={{ backgroundColor: definition.color }}
+          className="node-editor-header"
+          style={{ backgroundColor: data.color }}
         >
-          <Icon name={definition.icon} className="text-white" size={24} />
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-white">{definition.name}</h2>
-            <p className="text-sm text-white/70">{definition.description}</p>
+          <Icon name={data.icon} className="text-white" size={24} />
+          <div className="node-editor-header-info">
+            <h2 className="node-editor-title">{data.label}</h2>
+            <p className="node-editor-description">{data.description}</p>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-white/20 transition-colors"
-          >
-            <X className="text-white" size={20} />
+          <button onClick={handleClose} className="node-editor-close-btn">
+            <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[50vh]">
+        <div className="node-editor-content">
           {/* Inputs & Outputs Info */}
-          <div className="mb-6 grid grid-cols-2 gap-4">
-            <div className="p-3 bg-surface-800/50 rounded-lg">
-              <h4 className="text-xs font-medium text-surface-400 uppercase tracking-wider mb-2">
-                Inputs
-              </h4>
-              <div className="space-y-1">
-                {definition.inputs.map((input) => (
-                  <div key={input.id} className="text-sm">
-                    <span className="text-surface-200">{input.name}</span>
-                    <span className="text-surface-500 text-xs ml-2">
+          <div className="node-editor-ports">
+            <div className="node-editor-port-section">
+              <h4 className="node-editor-port-title">Inputs</h4>
+              <div className="node-editor-port-list">
+                {data.inputs.map((input) => (
+                  <div key={input.id} className="node-editor-port-item">
+                    <span className="node-editor-port-name">{input.name}</span>
+                    <span className="node-editor-port-shape">
                       {input.shape.join(' × ')}
                     </span>
                   </div>
                 ))}
+                {data.inputs.length === 0 && (
+                  <span className="node-editor-port-empty">No inputs</span>
+                )}
               </div>
             </div>
-            <div className="p-3 bg-surface-800/50 rounded-lg">
-              <h4 className="text-xs font-medium text-surface-400 uppercase tracking-wider mb-2">
-                Outputs
-              </h4>
-              <div className="space-y-1">
-                {definition.outputs.map((output) => (
-                  <div key={output.id} className="text-sm">
-                    <span className="text-surface-200">{output.name}</span>
-                    <span className="text-surface-500 text-xs ml-2">
+            <div className="node-editor-port-section">
+              <h4 className="node-editor-port-title">Outputs</h4>
+              <div className="node-editor-port-list">
+                {data.outputs.map((output) => (
+                  <div key={output.id} className="node-editor-port-item">
+                    <span className="node-editor-port-name">{output.name}</span>
+                    <span className="node-editor-port-shape">
                       {output.shape.join(' × ')}
                     </span>
                   </div>
                 ))}
+                {data.outputs.length === 0 && (
+                  <span className="node-editor-port-empty">No outputs</span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Parameters */}
-          {definition.parameters.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-surface-300 uppercase tracking-wider mb-4">
-                Parameters
-              </h3>
-              <div className="space-y-4">
-                {definition.parameters.map((param) => (
+          {data.parameterDefinitions.length > 0 && (
+            <div className="node-editor-parameters">
+              <h3 className="node-editor-section-title">Parameters</h3>
+              <div className="node-editor-parameter-list">
+                {data.parameterDefinitions.map((param) => (
                   <ParameterInput
                     key={param.id}
                     param={param}
                     value={localParams[param.id]}
                     onChange={(value) => handleParamChange(param.id, value)}
+                    accentColor={data.color}
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {definition.parameters.length === 0 && (
-            <div className="text-center py-8 text-surface-400">
+          {data.parameterDefinitions.length === 0 && (
+            <div className="node-editor-no-params">
               This node has no configurable parameters
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-surface-700/50 flex justify-end gap-3">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2 text-surface-300 hover:text-surface-100 transition-colors"
-          >
+        <div className="node-editor-footer">
+          <button onClick={handleClose} className="node-editor-cancel-btn">
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 rounded-lg font-medium text-white transition-all"
-            style={{ backgroundColor: definition.color }}
+            className="node-editor-save-btn"
+            style={{ backgroundColor: data.color }}
           >
             Save Changes
           </button>
@@ -263,18 +301,21 @@ function NodeEditorContent({ node, definition }: NodeEditorContentProps) {
       </div>
     </div>
   );
-}
+});
 
-export function NodeEditor() {
-  const { editingNodeId, nodes } = usePipelineStore();
+// =============================================================================
+// Node Editor (Main Component)
+// =============================================================================
 
-  const node = nodes.find((n) => n.id === editingNodeId);
-  const definition = node ? nodeDefinitionsMap[node.definitionId] : null;
+export const NodeEditor = memo(function NodeEditor() {
+  const editingNode = usePipelineStore(selectEditingNode);
 
-  if (!editingNodeId || !node || !definition) {
+  if (!editingNode) {
     return null;
   }
 
-  // Use key to force remount when editing different nodes, resetting local state
-  return <NodeEditorContent key={editingNodeId} node={node} definition={definition} />;
-}
+  // Use key to force remount when editing different nodes
+  return <NodeEditorContent key={editingNode.id} node={editingNode} />;
+});
+
+export default NodeEditor;

@@ -1,57 +1,199 @@
-import { Play, Trash2, Zap } from './Icons';
-import { usePipelineStore } from '../store/pipelineStore';
+import { memo, useCallback, useRef } from 'react';
+import {
+  Play,
+  Trash2,
+  Zap,
+  Download,
+  Upload,
+  RotateCcw,
+  Maximize2,
+} from 'lucide-react';
+import { useReactFlow } from '@xyflow/react';
+import { usePipelineStore, selectNodeCount, selectEdgeCount } from '../store/pipelineStore';
 
-export function Header() {
-  const { nodes, connections, clearPipeline } = usePipelineStore();
+export const Header = memo(function Header() {
+  const { clearPipeline, loadDemoPipeline, exportPipeline, loadPipeline } =
+    usePipelineStore();
+  const nodeCount = usePipelineStore(selectNodeCount);
+  const edgeCount = usePipelineStore(selectEdgeCount);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { fitView } = useReactFlow();
+
+  // Export pipeline to JSON file
+  const handleExport = useCallback(() => {
+    const pipeline = exportPipeline();
+    const blob = new Blob([JSON.stringify(pipeline, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pipeline-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [exportPipeline]);
+
+  // Import pipeline from JSON file
+  const handleImport = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const pipeline = JSON.parse(event.target?.result as string);
+          loadPipeline(pipeline);
+          setTimeout(() => fitView({ padding: 0.2 }), 100);
+        } catch (error) {
+          console.error('Failed to parse pipeline file:', error);
+        }
+      };
+      reader.readAsText(file);
+
+      // Reset input
+      e.target.value = '';
+    },
+    [loadPipeline, fitView]
+  );
+
+  // Reset to demo pipeline
+  const handleReset = useCallback(() => {
+    loadDemoPipeline();
+    setTimeout(() => fitView({ padding: 0.2 }), 100);
+  }, [loadDemoPipeline, fitView]);
+
+  // Fit view
+  const handleFitView = useCallback(() => {
+    fitView({ padding: 0.2, duration: 300 });
+  }, [fitView]);
+
+  // Clear pipeline
+  const handleClear = useCallback(() => {
+    if (nodeCount > 0 && !confirm('Are you sure you want to clear the pipeline?')) {
+      return;
+    }
+    clearPipeline();
+  }, [clearPipeline, nodeCount]);
+
+  // Run pipeline (placeholder)
+  const handleRun = useCallback(() => {
+    alert('Pipeline execution coming soon! This will connect to the Python backend.');
+  }, []);
 
   return (
-    <header className="h-14 glass border-b border-surface-700/50 flex items-center px-4 gap-4">
+    <header className="header">
+      {/* Hidden file input for import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       {/* Logo & Title */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+      <div className="header-brand">
+        <div className="header-logo">
           <Zap className="text-white" size={18} />
         </div>
-        <div>
-          <h1 className="text-sm font-semibold text-surface-100">
-            NeuroFlow Pipeline Builder
-          </h1>
-          <p className="text-xs text-surface-400">
-            Dynamic Brain State Analysis
-          </p>
+        <div className="header-title-group">
+          <h1 className="header-title">NeuroFlow Pipeline Builder</h1>
+          <p className="header-subtitle">Dynamic Brain State Analysis</p>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="flex-1 flex items-center justify-center gap-6">
-        <div className="text-center">
-          <div className="text-lg font-semibold text-surface-100">{nodes.length}</div>
-          <div className="text-xs text-surface-400">Nodes</div>
+      <div className="header-stats">
+        <div className="header-stat">
+          <div className="header-stat-value">{nodeCount}</div>
+          <div className="header-stat-label">Nodes</div>
         </div>
-        <div className="w-px h-8 bg-surface-700" />
-        <div className="text-center">
-          <div className="text-lg font-semibold text-surface-100">{connections.length}</div>
-          <div className="text-xs text-surface-400">Connections</div>
+        <div className="header-stat-divider" />
+        <div className="header-stat">
+          <div className="header-stat-value">{edgeCount}</div>
+          <div className="header-stat-label">Connections</div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2">
+      <div className="header-actions">
+        {/* View actions */}
+        <div className="header-action-group">
+          <button
+            onClick={handleFitView}
+            className="header-btn header-btn-ghost"
+            title="Fit view"
+          >
+            <Maximize2 size={16} />
+          </button>
+        </div>
+
+        <div className="header-action-divider" />
+
+        {/* File actions */}
+        <div className="header-action-group">
+          <button
+            onClick={handleImport}
+            className="header-btn header-btn-ghost"
+            title="Import pipeline"
+          >
+            <Upload size={16} />
+            <span>Import</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="header-btn header-btn-ghost"
+            title="Export pipeline"
+            disabled={nodeCount === 0}
+          >
+            <Download size={16} />
+            <span>Export</span>
+          </button>
+        </div>
+
+        <div className="header-action-divider" />
+
+        {/* Pipeline actions */}
+        <div className="header-action-group">
+          <button
+            onClick={handleReset}
+            className="header-btn header-btn-ghost"
+            title="Reset to demo pipeline"
+          >
+            <RotateCcw size={16} />
+            <span>Reset</span>
+          </button>
+          <button
+            onClick={handleClear}
+            className="header-btn header-btn-ghost header-btn-danger"
+            title="Clear pipeline"
+            disabled={nodeCount === 0}
+          >
+            <Trash2 size={16} />
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div className="header-action-divider" />
+
+        {/* Run */}
         <button
-          onClick={clearPipeline}
-          className="px-3 py-1.5 rounded-lg text-sm text-surface-300 hover:text-surface-100 hover:bg-surface-800 transition-colors flex items-center gap-2"
-          disabled={nodes.length === 0}
-        >
-          <Trash2 size={16} />
-          Clear
-        </button>
-        <button
-          className="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 transition-all flex items-center gap-2 shadow-lg shadow-primary-500/25"
-          disabled={nodes.length === 0}
+          onClick={handleRun}
+          className="header-btn header-btn-primary"
+          disabled={nodeCount === 0}
         >
           <Play size={16} />
-          Run Pipeline
+          <span>Run Pipeline</span>
         </button>
       </div>
     </header>
   );
-}
+});
+
+export default Header;

@@ -1,6 +1,8 @@
-import type { PipelineNode, Connection } from '../types';
+import type { SerializedNode, SerializedConnection } from '../types';
 
-export const demoPipelineNodes: PipelineNode[] = [
+// Demo pipeline nodes in serialized format
+// These will be converted to React Flow nodes by the store
+export const demoPipelineNodes: SerializedNode[] = [
   {
     id: 'node-1',
     definitionId: 'extract_roi_timeseries',
@@ -99,7 +101,8 @@ export const demoPipelineNodes: PipelineNode[] = [
   },
 ];
 
-export const demoPipelineConnections: Connection[] = [
+// Demo pipeline connections in serialized format
+export const demoPipelineConnections: SerializedConnection[] = [
   {
     id: 'conn-1',
     sourceNodeId: 'node-1',
