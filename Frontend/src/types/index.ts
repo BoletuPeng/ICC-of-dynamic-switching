@@ -1,7 +1,7 @@
-import type { Node, Edge, NodeProps, BuiltInNode, BuiltInEdge } from '@xyflow/react';
+import type { Node, Edge, NodeProps } from '@xyflow/react';
 
 // =============================================================================
-// Port & Parameter Definitions
+// Core Definitions
 // =============================================================================
 
 export interface PortDefinition {
@@ -33,18 +33,9 @@ export interface ParameterDefinition {
   description: string;
 }
 
-// =============================================================================
-// Node Definition (Template for creating nodes)
-// =============================================================================
-
 export type NodeCategory =
-  | 'preprocessing'
-  | 'connectivity'
-  | 'community'
-  | 'metrics'
-  | 'analysis'
-  | 'clustering'
-  | 'output';
+  | 'preprocessing' | 'connectivity' | 'community'
+  | 'metrics' | 'analysis' | 'clustering' | 'output';
 
 export interface NodeDefinition {
   id: string;
@@ -59,7 +50,7 @@ export interface NodeDefinition {
 }
 
 // =============================================================================
-// React Flow Node Types
+// React Flow Types
 // =============================================================================
 
 export type PipelineNodeData = {
@@ -73,44 +64,23 @@ export type PipelineNodeData = {
   outputs: PortDefinition[];
   parameters: Record<string, unknown>;
   parameterDefinitions: ParameterDefinition[];
-  [key: string]: unknown; // Index signature for React Flow compatibility
+  [key: string]: unknown;
 };
 
 export type PipelineNode = Node<PipelineNodeData, 'pipeline'>;
-
 export type PipelineNodeProps = NodeProps<PipelineNode>;
-
-// =============================================================================
-// React Flow Edge Types
-// =============================================================================
 
 export type PipelineEdgeData = {
   sourcePortId: string;
   targetPortId: string;
   animated?: boolean;
-  [key: string]: unknown; // Index signature for React Flow compatibility
+  [key: string]: unknown;
 };
 
 export type PipelineEdge = Edge<PipelineEdgeData, 'pipeline'>;
 
-// All node types for React Flow
-export type AppNode = PipelineNode | BuiltInNode;
-export type AppEdge = PipelineEdge | BuiltInEdge;
-
 // =============================================================================
-// Handle (Port) Connection
-// =============================================================================
-
-export type HandleType = 'source' | 'target';
-
-export interface HandleInfo {
-  nodeId: string;
-  handleId: string;
-  handleType: HandleType;
-}
-
-// =============================================================================
-// UI State Types
+// Serialization
 // =============================================================================
 
 export interface ViewportState {
@@ -118,15 +88,6 @@ export interface ViewportState {
   y: number;
   zoom: number;
 }
-
-export interface DragItem {
-  type: 'node-definition';
-  definitionId: string;
-}
-
-// =============================================================================
-// Pipeline State (for save/load)
-// =============================================================================
 
 export interface SerializedNode {
   id: string;
@@ -153,29 +114,6 @@ export interface SerializedPipeline {
 }
 
 // =============================================================================
-// Execution Types (for future backend integration)
-// =============================================================================
-
-export type ExecutionStatus = 'idle' | 'running' | 'completed' | 'error';
-
-export interface NodeExecutionState {
-  nodeId: string;
-  status: ExecutionStatus;
-  progress?: number;
-  error?: string;
-  startTime?: number;
-  endTime?: number;
-}
-
-export interface PipelineExecutionState {
-  status: ExecutionStatus;
-  currentNodeId?: string;
-  nodeStates: Record<string, NodeExecutionState>;
-  startTime?: number;
-  endTime?: number;
-}
-
-// =============================================================================
 // Constants
 // =============================================================================
 
@@ -187,7 +125,7 @@ export const CATEGORY_COLORS: Record<NodeCategory, string> = {
   analysis: '#ec4899',
   clustering: '#06b6d4',
   output: '#ef4444',
-} as const;
+};
 
 export const CATEGORY_LABELS: Record<NodeCategory, string> = {
   preprocessing: 'Preprocessing',
@@ -197,4 +135,4 @@ export const CATEGORY_LABELS: Record<NodeCategory, string> = {
   analysis: 'Analysis',
   clustering: 'Clustering',
   output: 'Output',
-} as const;
+};
