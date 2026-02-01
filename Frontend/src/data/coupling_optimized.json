@@ -11,8 +11,8 @@
       "name": "Time Series Data",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_timepoints", "n_nodes"],
-      "description": "ROI time series data [TIME × NODES]"
+      "shape": ["n_rois", "n_timepoints"],
+      "description": "ROI time series data [ROIS × TIME]"
     }
   ],
   "outputs": [
@@ -21,8 +21,8 @@
       "name": "MTD Connectivity",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_nodes", "n_nodes", "n_timepoints"],
-      "description": "Time-varying connectivity matrix [NODES × NODES × TIME]"
+      "shape": ["n_rois", "n_rois", "n_mtd_timepoints"],
+      "description": "Time-varying connectivity matrix [ROIS × ROIS × MTD_TIME]. MTD_TIME = n_timepoints - window - 1 when trimmed"
     }
   ],
   "parameters": [
@@ -33,7 +33,8 @@
       "default": 14,
       "min": 3,
       "max": 50,
-      "description": "Smoothing window size for moving average (in TRs)"
+      "description": "Smoothing window size for moving average (in TRs)",
+      "affectsShape": true
     },
     {
       "id": "direction",
@@ -64,5 +65,6 @@
       "default": true,
       "description": "Enable parallel computation"
     }
-  ]
+  ],
+  "shapeNotes": "When trim=1, output n_mtd_timepoints = n_timepoints - window - 1"
 }

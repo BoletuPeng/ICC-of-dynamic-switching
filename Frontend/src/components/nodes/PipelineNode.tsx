@@ -3,8 +3,40 @@ import { Handle, Position } from '@xyflow/react';
 import { Settings, Trash2, Copy } from 'lucide-react';
 import { Icon } from '../Icons';
 import { usePipelineStore } from '../../store/pipelineStore';
-import type { PipelineNodeProps } from '../../types';
+import { useNodeShapeInfo } from '../../hooks/useShapeInference';
+import type { PipelineNodeProps, ResolvedPortShape } from '../../types';
 import { CATEGORY_LABELS } from '../../types';
+
+/**
+ * Shape display component for ports
+ */
+const ShapeDisplay = memo(function ShapeDisplay({
+  shape,
+  color,
+}: {
+  shape: ResolvedPortShape | undefined;
+  color: string;
+}) {
+  if (!shape) return null;
+
+  const displayText = shape.isFullyResolved && shape.resolved
+    ? shape.resolved
+    : shape.symbolic;
+
+  const isResolved = shape.isFullyResolved;
+
+  return (
+    <span
+      className={`node-port-shape ${isResolved ? 'resolved' : 'symbolic'}`}
+      title={`Shape: ${shape.symbolic}${shape.resolved ? ` = ${shape.resolved}` : ''}`}
+      style={{
+        color: isResolved ? color : undefined,
+      }}
+    >
+      [{displayText}]
+    </span>
+  );
+});
 
 export const PipelineNode = memo(function PipelineNode({
   id,
@@ -12,6 +44,7 @@ export const PipelineNode = memo(function PipelineNode({
   selected,
 }: PipelineNodeProps) {
   const { setEditingNode, removeNode, duplicateNode } = usePipelineStore();
+  const shapeInfo = useNodeShapeInfo(id);
 
   const handleEdit = useCallback(
     (e: React.MouseEvent) => {
@@ -43,9 +76,12 @@ export const PipelineNode = memo(function PipelineNode({
 
   const categoryLabel = CATEGORY_LABELS[data.category] || data.category;
 
+  // Check if this is a control flow node
+  const isControlFlow = data.isControlFlow || data.category === 'control';
+
   return (
     <div
-      className={`pipeline-node group ${selected ? 'selected' : ''}`}
+      className={`pipeline-node group ${selected ? 'selected' : ''} ${isControlFlow ? 'control-flow' : ''}`}
       onDoubleClick={handleDoubleClick}
       style={{ '--node-color': data.color } as React.CSSProperties}
     >
@@ -93,46 +129,56 @@ export const PipelineNode = memo(function PipelineNode({
         <div className="node-ports">
           {/* Inputs */}
           <div className="node-port-column">
-            {data.inputs.map((input, index) => (
-              <div key={input.id} className="node-port node-port-input">
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={input.id}
-                  className="node-handle node-handle-input"
-                  style={{
-                    top: `${((index + 1) / (data.inputs.length + 1)) * 100}%`,
-                    backgroundColor: data.color,
-                  }}
-                />
-                <span className="node-port-label" title={input.description}>
-                  {input.name}
-                </span>
-                <span className="node-port-type">{input.dtype}</span>
-              </div>
-            ))}
+            {data.inputs.map((input, index) => {
+              const inputShape = shapeInfo?.inputShapes[input.id];
+              return (
+                <div key={input.id} className="node-port node-port-input">
+                  <Handle
+                    type="target"
+                    position={Position.Left}
+                    id={input.id}
+                    className="node-handle node-handle-input"
+                    style={{
+                      top: `${((index + 1) / (data.inputs.length + 1)) * 100}%`,
+                      backgroundColor: data.color,
+                    }}
+                  />
+                  <div className="node-port-info">
+                    <span className="node-port-label" title={input.description}>
+                      {input.name}
+                    </span>
+                    <ShapeDisplay shape={inputShape} color={data.color} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Outputs */}
           <div className="node-port-column node-port-column-output">
-            {data.outputs.map((output, index) => (
-              <div key={output.id} className="node-port node-port-output">
-                <span className="node-port-type">{output.dtype}</span>
-                <span className="node-port-label" title={output.description}>
-                  {output.name}
-                </span>
-                <Handle
-                  type="source"
-                  position={Position.Right}
-                  id={output.id}
-                  className="node-handle node-handle-output"
-                  style={{
-                    top: `${((index + 1) / (data.outputs.length + 1)) * 100}%`,
-                    backgroundColor: data.color,
-                  }}
-                />
-              </div>
-            ))}
+            {data.outputs.map((output, index) => {
+              const outputShape = shapeInfo?.outputShapes[output.id];
+              return (
+                <div key={output.id} className="node-port node-port-output">
+                  <div className="node-port-info">
+                    <ShapeDisplay shape={outputShape} color={data.color} />
+                    <span className="node-port-label" title={output.description}>
+                      {output.name}
+                    </span>
+                  </div>
+                  <Handle
+                    type="source"
+                    position={Position.Right}
+                    id={output.id}
+                    className="node-handle node-handle-output"
+                    style={{
+                      top: `${((index + 1) / (data.outputs.length + 1)) * 100}%`,
+                      backgroundColor: data.color,
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -19,6 +19,10 @@ import {
   Play,
   Zap,
   Box,
+  FolderOpen,
+  Database,
+  ArrowDownToLine,
+  ArrowUpFromLine,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -43,6 +47,10 @@ const iconMap: Record<string, LucideIcon> = {
   play: Play,
   zap: Zap,
   box: Box,
+  'folder-open': FolderOpen,
+  database: Database,
+  'arrow-down-to-line': ArrowDownToLine,
+  'arrow-up-from-line': ArrowUpFromLine,
 };
 
 interface IconProps {
@@ -78,4 +86,8 @@ export {
   Play,
   Zap,
   Box,
+  FolderOpen,
+  Database,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 };

@@ -1,0 +1,101 @@
+{
+  "id": "read_fmri",
+  "name": "Read fMRI Data",
+  "description": "Load preprocessed fMRI data from BIDS-formatted directory. Supports scanning data dimensions on save.",
+  "category": "input",
+  "color": "#22c55e",
+  "icon": "folder-open",
+  "isSource": true,
+
+  "inputs": [],
+
+  "outputs": [
+    {
+      "id": "bold_data",
+      "name": "BOLD Data",
+      "type": "ndarray",
+      "dtype": "float64",
+      "shape": ["n_participants", "n_sessions", "n_vertices", "n_timepoints"],
+      "description": "Preprocessed BOLD fMRI data [Participants × Sessions × Vertices × Timepoints]"
+    },
+    {
+      "id": "metadata",
+      "name": "Metadata",
+      "type": "dict",
+      "dtype": "object",
+      "shape": [],
+      "description": "Data metadata including TR, participant IDs, etc."
+    }
+  ],
+
+  "parameters": [
+    {
+      "id": "data_path",
+      "name": "Data Path",
+      "type": "string",
+      "default": "",
+      "description": "Path to BIDS-formatted fMRI data directory"
+    },
+    {
+      "id": "space",
+      "name": "Space",
+      "type": "select",
+      "options": ["fsaverage6", "fsaverage5", "MNI152NLin2009cAsym"],
+      "default": "fsaverage6",
+      "description": "Coordinate space of the data"
+    },
+    {
+      "id": "scan_on_save",
+      "name": "Scan Data on Save",
+      "type": "boolean",
+      "default": false,
+      "description": "Pre-scan data directory to determine dimensions when saving"
+    },
+    {
+      "id": "n_participants",
+      "name": "Participants",
+      "type": "int",
+      "default": 0,
+      "min": 0,
+      "description": "Number of participants (0 = unknown, will show as n_participants)",
+      "affectsShape": true
+    },
+    {
+      "id": "n_sessions",
+      "name": "Sessions",
+      "type": "int",
+      "default": 0,
+      "min": 0,
+      "description": "Number of sessions per participant (0 = unknown)",
+      "affectsShape": true
+    },
+    {
+      "id": "n_vertices",
+      "name": "Vertices",
+      "type": "int",
+      "default": 81924,
+      "min": 0,
+      "description": "Number of vertices in surface space (81924 for fsaverage6)",
+      "affectsShape": true
+    },
+    {
+      "id": "n_timepoints",
+      "name": "Timepoints",
+      "type": "int",
+      "default": 0,
+      "min": 0,
+      "description": "Number of timepoints per run (0 = unknown)",
+      "affectsShape": true
+    }
+  ],
+
+  "shapeBindings": {
+    "description": "Parameters directly bind to shape dimensions when non-zero",
+    "rules": [
+      { "param": "n_participants", "bindsTo": "n_participants", "whenNonZero": true },
+      { "param": "n_sessions", "bindsTo": "n_sessions", "whenNonZero": true },
+      { "param": "n_vertices", "bindsTo": "n_vertices", "whenNonZero": true },
+      { "param": "n_timepoints", "bindsTo": "n_timepoints", "whenNonZero": true }
+    ]
+  }
+}

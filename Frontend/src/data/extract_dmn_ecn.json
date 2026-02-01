@@ -11,8 +11,8 @@
       "name": "ROI Time Series",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_timepoints", "n_rois"],
-      "description": "Full ROI time series (e.g., 300 parcels)"
+      "shape": ["n_rois", "n_timepoints"],
+      "description": "Full ROI time series (e.g., 300 parcels) [ROIS × TIME]"
     }
   ],
   "outputs": [
@@ -21,8 +21,8 @@
       "name": "DMN/ECN Time Series",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_timepoints", "106"],
-      "description": "Filtered time series containing only DMN (58) and ECN (48) regions"
+      "shape": [106, "n_timepoints"],
+      "description": "Filtered time series containing only DMN (58) and ECN (48) regions [106 × TIME]"
     }
   ],
   "parameters": [
@@ -32,7 +32,7 @@
       "type": "array",
       "dtype": "int32",
       "default": "auto",
-      "description": "Indices of DMN regions (auto-detected from Schaefer atlas)"
+      "description": "Indices of DMN regions (auto-detected from Schaefer atlas, 58 regions)"
     },
     {
       "id": "ecn_indices",
@@ -40,7 +40,8 @@
       "type": "array",
       "dtype": "int32",
       "default": "auto",
-      "description": "Indices of ECN regions (auto-detected from Schaefer atlas)"
+      "description": "Indices of ECN regions (auto-detected from Schaefer atlas, 48 regions)"
     }
-  ]
+  ],
+  "shapeNotes": "Output always has 106 ROIs: 58 DMN + 48 ECN from Schaefer 300P 17N atlas"
 }

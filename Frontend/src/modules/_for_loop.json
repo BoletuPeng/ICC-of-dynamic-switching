@@ -1,0 +1,70 @@
+{
+  "id": "for_loop",
+  "name": "For Loop",
+  "description": "Iterate over outer dimensions, processing each slice independently. Unpacks dimensions for element-wise processing.",
+  "category": "control",
+  "color": "#6366f1",
+  "icon": "repeat",
+  "isControlFlow": true,
+  "controlFlowType": "for",
+
+  "inputs": [
+    {
+      "id": "data_in",
+      "name": "Data Input",
+      "type": "ndarray",
+      "dtype": "any",
+      "shape": ["...batch", "...inner"],
+      "description": "Input data with batch dimensions to iterate over"
+    }
+  ],
+
+  "outputs": [
+    {
+      "id": "data_out",
+      "name": "Loop Body",
+      "type": "ndarray",
+      "dtype": "any",
+      "shape": ["...inner"],
+      "description": "Single slice for processing (batch dimensions removed)"
+    },
+    {
+      "id": "loop_index",
+      "name": "Loop Index",
+      "type": "tuple",
+      "dtype": "int",
+      "shape": ["n_iterate_dims"],
+      "description": "Current iteration indices"
+    }
+  ],
+
+  "parameters": [
+    {
+      "id": "n_iterate_dims",
+      "name": "Iterate Dimensions",
+      "type": "int",
+      "default": 1,
+      "min": 1,
+      "max": 4,
+      "description": "Number of outer dimensions to iterate over",
+      "affectsShape": true
+    },
+    {
+      "id": "iterate_dim_names",
+      "name": "Dimension Names",
+      "type": "string",
+      "default": "n_batch",
+      "description": "Comma-separated names for iterated dimensions (e.g., 'n_participants, n_sessions')"
+    }
+  ],
+
+  "shapeTransform": {
+    "description": "Removes the first N dimensions from input shape",
+    "outputRules": [
+      {
+        "port": "data_out",
+        "rule": "input.data_in.shape.slice(@n_iterate_dims)"
+      }
+    ]
+  }
+}
