@@ -84,13 +84,13 @@ export function NodeCard({
         selectNode(node.id);
       }}
       onDoubleClick={handleDoubleClick}
+      {...attributes}
+      {...listeners}
     >
-      {/* Header - draggable area */}
+      {/* Header */}
       <div
         className="px-3 py-2 flex items-center gap-2"
         style={{ backgroundColor: definition.color }}
-        {...attributes}
-        {...listeners}
       >
         <Icon name={definition.icon} className="text-white" size={18} />
         <span className="flex-1 text-sm font-semibold text-white truncate">
@@ -101,6 +101,7 @@ export function NodeCard({
             e.stopPropagation();
             setEditingNode(node.id);
           }}
+          onPointerDown={(e) => e.stopPropagation()}
           className="p-1 rounded hover:bg-white/20 transition-colors"
           title="Edit parameters"
         >
@@ -111,6 +112,7 @@ export function NodeCard({
             e.stopPropagation();
             removeNode(node.id);
           }}
+          onPointerDown={(e) => e.stopPropagation()}
           className="p-1 rounded hover:bg-white/20 transition-colors"
           title="Delete node"
         >

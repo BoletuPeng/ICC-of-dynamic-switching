@@ -36,11 +36,10 @@ export function ConnectionLine({
         <path
           d={path}
           fill="none"
-          stroke="transparent"
-          strokeWidth={20}
+          stroke="rgba(255,255,255,0.01)"
+          strokeWidth={24}
           onContextMenu={onRightClick}
-          style={{ pointerEvents: 'stroke' }}
-          className="cursor-pointer"
+          style={{ pointerEvents: 'auto', cursor: 'pointer' }}
         />
       )}
 

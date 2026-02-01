@@ -67,6 +67,7 @@ export function Port({
         style={{ color }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        onPointerDown={(e) => e.stopPropagation()}
         title={`${port.name}: ${port.description}`}
       />
       <span className="text-xs text-surface-400 truncate max-w-[80px]">

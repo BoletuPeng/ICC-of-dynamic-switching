@@ -14,12 +14,13 @@ interface ConnectionState {
   currentPosition: Position;
 }
 
-// Constants for node dimensions
+// Constants for node dimensions - must match CSS in NodeCard and Port components
 const NODE_WIDTH = 220;
-const NODE_HEADER_HEIGHT = 36;
-const PORT_HEIGHT = 28;
-const PORT_PADDING = 12;
-const PORT_RADIUS = 6;
+const NODE_HEADER_HEIGHT = 36;  // header py-2 (16px) + content (~20px)
+const BODY_PADDING = 12;        // body p-3
+const PORT_ROW_HEIGHT = 28;     // Port h-7
+const PORT_GAP = 4;             // flex gap-1
+const PORT_DOT_SIZE = 12;       // Port w-3 h-3
 
 // Calculate port position based on node position and port index
 function calculatePortPosition(
@@ -35,11 +36,21 @@ function calculatePortPosition(
   const portIndex = ports.findIndex((p) => p.id === portId);
   if (portIndex === -1) return null;
 
+  // X position: port dots are positioned within body padding
+  // Input ports: left column, dot at left edge
+  // Output ports: right column, dot at right edge
   const x = portType === 'input'
-    ? node.position.x + PORT_RADIUS + viewOffset.x
-    : node.position.x + NODE_WIDTH - PORT_RADIUS + viewOffset.x;
+    ? node.position.x + BODY_PADDING + PORT_DOT_SIZE / 2 + viewOffset.x
+    : node.position.x + NODE_WIDTH - BODY_PADDING - PORT_DOT_SIZE / 2 + viewOffset.x;
 
-  const y = node.position.y + NODE_HEADER_HEIGHT + PORT_PADDING + (portIndex * PORT_HEIGHT) + PORT_HEIGHT / 2 + viewOffset.y;
+  // Y position: header + body padding + port rows (including gaps)
+  // Each port row is PORT_ROW_HEIGHT, with PORT_GAP between them
+  const y = node.position.y
+    + NODE_HEADER_HEIGHT
+    + BODY_PADDING
+    + (portIndex * (PORT_ROW_HEIGHT + PORT_GAP))
+    + PORT_ROW_HEIGHT / 2
+    + viewOffset.y;
 
   return { x, y };
 }
@@ -304,8 +315,8 @@ export function Canvas() {
         }}
       />
 
-      {/* Connection SVG layer */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
+      {/* Connection SVG layer - pointer-events handled by individual elements */}
+      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 5 }}>
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="coloredBlur" />
