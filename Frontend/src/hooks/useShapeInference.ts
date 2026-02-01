@@ -170,6 +170,7 @@ function extractParameterBindings(
 
 /**
  * Get incoming shape for a specific port
+ * Handles both resolved (numeric) and symbolic shapes
  */
 function getIncomingShape(
   nodeId: string,
@@ -187,16 +188,30 @@ function getIncomingShape(
   if (!sourceShapeInfo) return undefined;
 
   const sourcePortShape = sourceShapeInfo.outputShapes[edge.sourceHandle || ''];
-  if (!sourcePortShape || !sourcePortShape.resolved) return undefined;
+  if (!sourcePortShape) return undefined;
 
-  // Convert ResolvedPortShape back to ResolvedShape
-  const parts = sourcePortShape.resolved.split(' × ');
+  // Handle dynamic/empty shapes
+  if (sourcePortShape.symbolic === '...' || sourcePortShape.symbolic === '') {
+    return undefined;
+  }
+
   const symbolicParts = sourcePortShape.symbolic.split(' × ');
 
-  return parts.map((value, i) => ({
-    symbolic: symbolicParts[i] || value,
-    value: parseInt(value, 10),
-    isResolved: !isNaN(parseInt(value, 10)),
+  // If we have resolved values, use them
+  if (sourcePortShape.resolved) {
+    const parts = sourcePortShape.resolved.split(' × ');
+    return parts.map((value, i) => ({
+      symbolic: symbolicParts[i] || value,
+      value: parseInt(value, 10),
+      isResolved: !isNaN(parseInt(value, 10)),
+    }));
+  }
+
+  // Otherwise, return symbolic shape without resolved values
+  return symbolicParts.map(symbolic => ({
+    symbolic,
+    value: undefined,
+    isResolved: false,
   }));
 }
 
@@ -233,14 +248,20 @@ function computeShapes(
 
   // Sort nodes topologically
   const sortedIds = buildDependencyOrder(nodes, edges);
+  console.log('[computeShapes] Processing order:', sortedIds);
 
   // Process each node in order
   for (const nodeId of sortedIds) {
     const node = nodeMap.get(nodeId);
     if (!node) continue;
 
+    console.log(`[computeShapes] Processing node ${nodeId} (${node.data.definitionId})`);
+
     const definition = nodeDefinitionsMap[node.data.definitionId] as ModuleDefinition | undefined;
-    if (!definition) continue;
+    if (!definition) {
+      console.log(`[computeShapes] No definition found for ${node.data.definitionId}`);
+      continue;
+    }
 
     // Start with parameter-based bindings
     const bindings = extractParameterBindings(node, definition);
@@ -296,7 +317,10 @@ function computeShapes(
 
     if (isForLoopNode(node.data.definitionId)) {
       // For Loop: dynamically compute output from input
+      console.log(`[For Loop] Getting incoming shape for data_in`);
+      console.log(`[For Loop] Available nodeShapes:`, Object.keys(nodeShapes));
       const dataInShape = getIncomingShape(nodeId, 'data_in', edges, nodeShapes);
+      console.log(`[For Loop] dataInShape:`, dataInShape);
       const nIterateDims = (node.data.parameters.n_iterate_dims as number) || 1;
 
       const { loopBody, loopIdRef } = computeForLoopOutputs(
@@ -304,6 +328,8 @@ function computeShapes(
         nIterateDims,
         nodeId
       );
+      console.log(`[For Loop] loopBody.shape:`, loopBody.shape);
+      console.log(`[For Loop] loopIdRef:`, loopIdRef.metadata?.loopIdRefData);
 
       // Set input shape to what's actually coming in
       if (dataInShape) {
@@ -381,6 +407,7 @@ function computeShapes(
           outputShapes[output.id] = toPortShape(resolved);
         }
       }
+      console.log(`[Regular Node ${nodeId}] outputShapes:`, outputShapes);
     }
 
     nodeShapes[nodeId] = {
@@ -389,6 +416,7 @@ function computeShapes(
       dimensionBindings: bindings,
       loopIdRefData,
     };
+    console.log(`[computeShapes] Saved nodeShapes for ${nodeId}:`, { inputShapes, outputShapes });
   }
 
   // Validate all connections
