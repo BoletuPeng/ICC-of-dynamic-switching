@@ -169,6 +169,34 @@ export interface StackConfig {
   expectedSizes: Record<string, number | string>;
 }
 
+/**
+ * Loop Id Ref metadata - carries information about stripped dimensions
+ * This is the output of a For Loop's loop_id_ref port
+ */
+export interface LoopIdRefData {
+  /** The symbolic name of the stripped dimension (e.g., "n_sessions") */
+  dimensionName: string;
+  /** The resolved value if known (e.g., 6) */
+  dimensionValue?: number;
+  /** Source For Loop node ID for reference tracking */
+  sourceNodeId: string;
+  /** The complete stripped dimensions array for multi-dimensional iteration */
+  strippedDimensions: ResolvedDimension[];
+}
+
+/**
+ * Dynamic shape result for control flow nodes
+ * Used when shapes need to be computed based on incoming connections
+ */
+export interface DynamicShapeResult {
+  /** The computed output shape */
+  shape: ResolvedShape;
+  /** Any metadata to pass downstream (e.g., LoopIdRefData) */
+  metadata?: Record<string, unknown>;
+  /** Warnings generated during computation */
+  warnings?: string[];
+}
+
 // =============================================================================
 // Graph Types for Shape Propagation
 // =============================================================================

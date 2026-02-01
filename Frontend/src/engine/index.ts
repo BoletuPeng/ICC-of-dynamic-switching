@@ -70,3 +70,34 @@ export {
   toLegacyNodeDefinition,
   getAllModulesLegacy,
 } from './moduleLoader';
+
+// Control flow handler
+export {
+  computeForLoopOutputs,
+  computeStackOutput,
+  isForLoopNode,
+  isStackNode,
+  isLoopIdRefPort,
+  expectsLoopIdRefInput,
+  formatLoopIdRefDisplay,
+  createDynamicShapeDisplay,
+  validateLoopBodyOutput,
+} from './controlFlowHandler';
+
+// Connection validator
+export {
+  validateConnection,
+  createUnconnectedResult,
+  formatShapeForMessage,
+  validateLoopIdRef,
+  CONNECTION_COLORS,
+} from './connectionValidator';
+export type {
+  ConnectionCompatibility,
+  ConnectionValidationResult,
+  DimensionComparison,
+  LoopIdRefMetadata,
+} from './connectionValidator';
+
+// Additional types from types.ts
+export type { LoopIdRefData, DynamicShapeResult } from './types';

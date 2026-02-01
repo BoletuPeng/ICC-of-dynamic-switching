@@ -1,7 +1,7 @@
 {
   "id": "for_loop",
   "name": "For Loop",
-  "description": "Iterate over outer dimensions, processing each slice independently. Unpacks dimensions for element-wise processing.",
+  "description": "Iterate over outer dimensions, processing each slice independently. Unpacks the first N dimensions, passing the remaining shape to the loop body.",
   "category": "control",
   "color": "#6366f1",
   "icon": "repeat",
@@ -14,27 +14,27 @@
       "name": "Data Input",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["n_batch", "n_inner"],
-      "description": "Input data with batch dimensions to iterate over"
+      "shape": ["..."],
+      "description": "Input data with dimensions to iterate over. The first N dimensions will be stripped for loop iteration."
     }
   ],
 
   "outputs": [
     {
-      "id": "data_out",
+      "id": "loop_body",
       "name": "Loop Body",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["n_inner"],
-      "description": "Single slice for processing (batch dimensions removed)"
+      "shape": ["..."],
+      "description": "Single slice for processing. Shape equals input shape minus the first N iterated dimensions."
     },
     {
-      "id": "loop_index",
-      "name": "Loop Index",
-      "type": "int",
-      "dtype": "int",
+      "id": "loop_id_ref",
+      "name": "Loop Id Ref",
+      "type": "loop_ref",
+      "dtype": "ref",
       "shape": [],
-      "description": "Current iteration index"
+      "description": "Reference carrying the stripped dimension information. Connect to Stack to restore the original shape structure."
     }
   ],
 
@@ -46,15 +46,8 @@
       "default": 1,
       "min": 1,
       "max": 4,
-      "description": "Number of outer dimensions to iterate over",
+      "description": "Number of outer dimensions to iterate over (strip from input)",
       "affectsShape": true
-    },
-    {
-      "id": "iterate_dim_names",
-      "name": "Dimension Names",
-      "type": "string",
-      "default": "n_batch",
-      "description": "Comma-separated names for iterated dimensions (e.g., 'n_participants, n_sessions')"
     }
   ]
 }
