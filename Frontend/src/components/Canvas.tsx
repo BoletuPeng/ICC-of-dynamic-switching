@@ -231,8 +231,9 @@ export function Canvas() {
         setNodeRef(el);
         (canvasRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
       }}
+      data-canvas
       className={`
-        flex-1 relative overflow-hidden
+        flex-1 relative overflow-hidden h-full
         bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950
         ${isOver ? 'ring-2 ring-inset ring-primary-500/50' : ''}
         ${isPanning ? 'cursor-grabbing' : 'cursor-default'}

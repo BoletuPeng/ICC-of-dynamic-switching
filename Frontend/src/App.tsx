@@ -139,9 +139,7 @@ export default function App() {
       <div className="w-full h-full flex flex-col">
         <Header />
         <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1" data-canvas>
-            <Canvas />
-          </div>
+          <Canvas />
           <Sidebar />
         </div>
         <NodeEditor />
