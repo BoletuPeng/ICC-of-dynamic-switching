@@ -11,8 +11,9 @@ import kmeansOptimized from './kmeans_optimized.json';
 import switchFrequency from './switch_frequency_optimized.json';
 import tsnrOptimized from './tsnr_optimized.json';
 
-import type { NodeDefinition } from '../types';
+import type { NodeDefinition, NodeCategory } from '../types';
 
+// All available node definitions
 export const nodeDefinitions: NodeDefinition[] = [
   extractRoiTimeseries as NodeDefinition,
   extractDmnEcn as NodeDefinition,
@@ -28,26 +29,51 @@ export const nodeDefinitions: NodeDefinition[] = [
   switchFrequency as NodeDefinition,
 ];
 
+// Map for quick lookup by ID
 export const nodeDefinitionsMap: Record<string, NodeDefinition> = Object.fromEntries(
   nodeDefinitions.map((def) => [def.id, def])
 );
 
-export const categoryColors: Record<string, string> = {
-  preprocessing: '#10b981',
-  connectivity: '#3b82f6',
-  community: '#8b5cf6',
-  metrics: '#f59e0b',
-  analysis: '#ec4899',
-  clustering: '#06b6d4',
-  output: '#ef4444',
-};
+// Group definitions by category
+export const nodesByCategory: Record<NodeCategory, NodeDefinition[]> = nodeDefinitions.reduce(
+  (acc, def) => {
+    const category = def.category as NodeCategory;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(def);
+    return acc;
+  },
+  {} as Record<NodeCategory, NodeDefinition[]>
+);
 
-export const categoryLabels: Record<string, string> = {
-  preprocessing: 'Preprocessing',
-  connectivity: 'Connectivity',
-  community: 'Community Detection',
-  metrics: 'Network Metrics',
-  analysis: 'Analysis',
-  clustering: 'Clustering',
-  output: 'Output',
-};
+// Get sorted categories for display
+export const sortedCategories: NodeCategory[] = [
+  'preprocessing',
+  'connectivity',
+  'community',
+  'metrics',
+  'analysis',
+  'clustering',
+  'output',
+];
+
+// Helper to get definition or throw
+export function getNodeDefinition(definitionId: string): NodeDefinition {
+  const def = nodeDefinitionsMap[definitionId];
+  if (!def) {
+    throw new Error(`Unknown node definition: ${definitionId}`);
+  }
+  return def;
+}
+
+// Helper to get default parameter values for a node definition
+export function getDefaultParameters(definition: NodeDefinition): Record<string, unknown> {
+  return definition.parameters.reduce(
+    (acc, param) => {
+      acc[param.id] = param.default;
+      return acc;
+    },
+    {} as Record<string, unknown>
+  );
+}

@@ -1,85 +1,81 @@
-import { useMemo, useState } from 'react';
-import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { Icon, ChevronDown, ChevronUp, Trash2 } from './Icons';
-import { nodeDefinitions, categoryLabels, categoryColors } from '../data';
-import type { NodeDefinition } from '../types';
+import { memo, useState, useCallback, type DragEvent } from 'react';
+import { ChevronDown, ChevronUp, Search, GripVertical } from 'lucide-react';
+import { Icon } from './Icons';
+import { nodesByCategory, sortedCategories, nodeDefinitions } from '../data';
+import { CATEGORY_COLORS, CATEGORY_LABELS, type NodeDefinition, type NodeCategory } from '../types';
 
-interface SidebarNodeProps {
+interface NodeItemProps {
   definition: NodeDefinition;
+  onDragStart: (event: DragEvent, definition: NodeDefinition) => void;
 }
 
-function SidebarNode({ definition }: SidebarNodeProps) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: `sidebar-${definition.id}`,
-    data: {
-      type: 'sidebar-node',
-      definitionId: definition.id,
+const NodeItem = memo(function NodeItem({ definition, onDragStart }: NodeItemProps) {
+  const handleDragStart = useCallback(
+    (event: DragEvent) => {
+      onDragStart(event, definition);
     },
-  });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
+    [definition, onDragStart]
+  );
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`
-        glass rounded-lg p-3 cursor-grab
-        transition-all duration-200
-        hover:bg-surface-700/50 hover:border-surface-500/30
-        ${isDragging ? 'opacity-50 cursor-grabbing shadow-2xl scale-105 z-50' : ''}
-      `}
-      {...listeners}
-      {...attributes}
+      className="sidebar-node-item"
+      draggable
+      onDragStart={handleDragStart}
+      style={{ '--node-color': definition.color } as React.CSSProperties}
     >
-      <div className="flex items-center gap-2">
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${definition.color}30` }}
-        >
-          <Icon name={definition.icon} size={18} style={{ color: definition.color }} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-surface-100 truncate">
-            {definition.name}
-          </div>
-          <div className="text-xs text-surface-400 truncate">
-            {definition.inputs.length} in · {definition.outputs.length} out
-          </div>
-        </div>
+      <div className="sidebar-node-grip">
+        <GripVertical size={14} className="text-surface-500" />
+      </div>
+      <div
+        className="sidebar-node-icon"
+        style={{ backgroundColor: definition.color }}
+      >
+        <Icon name={definition.icon} size={14} className="text-white" />
+      </div>
+      <div className="sidebar-node-info">
+        <span className="sidebar-node-name">{definition.name}</span>
+        <span className="sidebar-node-ports">
+          {definition.inputs.length} in / {definition.outputs.length} out
+        </span>
       </div>
     </div>
   );
-}
+});
 
 interface CategorySectionProps {
-  category: string;
-  nodes: NodeDefinition[];
+  category: NodeCategory;
+  definitions: NodeDefinition[];
   isExpanded: boolean;
   onToggle: () => void;
+  onDragStart: (event: DragEvent, definition: NodeDefinition) => void;
 }
 
-function CategorySection({ category, nodes, isExpanded, onToggle }: CategorySectionProps) {
-  const color = categoryColors[category] || '#64748b';
+const CategorySection = memo(function CategorySection({
+  category,
+  definitions,
+  isExpanded,
+  onToggle,
+  onDragStart,
+}: CategorySectionProps) {
+  const color = CATEGORY_COLORS[category] || '#64748b';
+  const label = CATEGORY_LABELS[category] || category;
 
   return (
-    <div className="mb-2">
+    <div className="sidebar-category">
       <button
+        className="sidebar-category-header"
         onClick={onToggle}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-800/50 transition-colors"
+        style={{ '--category-color': color } as React.CSSProperties}
       >
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: color }}
-        />
-        <span className="flex-1 text-left text-sm font-medium text-surface-200">
-          {categoryLabels[category] || category}
-        </span>
-        <span className="text-xs text-surface-500 mr-2">{nodes.length}</span>
+        <div className="flex items-center gap-2">
+          <div
+            className="sidebar-category-indicator"
+            style={{ backgroundColor: color }}
+          />
+          <span className="sidebar-category-label">{label}</span>
+          <span className="sidebar-category-count">{definitions.length}</span>
+        </div>
         {isExpanded ? (
           <ChevronUp size={16} className="text-surface-400" />
         ) : (
@@ -88,37 +84,35 @@ function CategorySection({ category, nodes, isExpanded, onToggle }: CategorySect
       </button>
 
       {isExpanded && (
-        <div className="mt-2 space-y-2 px-1 animate-slide-in">
-          {nodes.map((def) => (
-            <SidebarNode key={def.id} definition={def} />
+        <div className="sidebar-category-content">
+          {definitions.map((def) => (
+            <NodeItem
+              key={def.id}
+              definition={def}
+              onDragStart={onDragStart}
+            />
           ))}
         </div>
       )}
     </div>
   );
+});
+
+interface SidebarProps {
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export function Sidebar() {
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(['preprocessing', 'connectivity', 'community'])
+export const Sidebar = memo(function Sidebar({
+  isCollapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
+  const [expandedCategories, setExpandedCategories] = useState<Set<NodeCategory>>(
+    new Set(sortedCategories)
   );
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const { setNodeRef, isOver } = useDroppable({
-    id: 'sidebar-dropzone',
-  });
-
-  const groupedNodes = useMemo(() => {
-    const groups: Record<string, NodeDefinition[]> = {};
-    nodeDefinitions.forEach((def) => {
-      if (!groups[def.category]) {
-        groups[def.category] = [];
-      }
-      groups[def.category].push(def);
-    });
-    return groups;
-  }, []);
-
-  const toggleCategory = (category: string) => {
+  const handleToggleCategory = useCallback((category: NodeCategory) => {
     setExpandedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(category)) {
@@ -128,65 +122,101 @@ export function Sidebar() {
       }
       return next;
     });
-  };
+  }, []);
 
-  const categoryOrder = [
-    'preprocessing',
-    'connectivity',
-    'community',
-    'metrics',
-    'analysis',
-    'clustering',
-    'output',
-  ];
+  const handleDragStart = useCallback(
+    (event: DragEvent, definition: NodeDefinition) => {
+      event.dataTransfer.setData('application/reactflow', definition.id);
+      event.dataTransfer.effectAllowed = 'move';
+    },
+    []
+  );
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    []
+  );
+
+  // Filter nodes by search query
+  const filteredCategories = sortedCategories
+    .map((category) => {
+      const definitions = nodesByCategory[category] || [];
+      if (!searchQuery) return { category, definitions };
+
+      const query = searchQuery.toLowerCase();
+      const filtered = definitions.filter(
+        (def) =>
+          def.name.toLowerCase().includes(query) ||
+          def.description.toLowerCase().includes(query)
+      );
+      return { category, definitions: filtered };
+    })
+    .filter(({ definitions }) => definitions.length > 0);
+
+  if (isCollapsed) {
+    return (
+      <aside className="sidebar sidebar-collapsed">
+        <button
+          className="sidebar-expand-btn"
+          onClick={onToggleCollapse}
+          title="Expand sidebar"
+        >
+          <ChevronDown size={20} className="rotate-90" />
+        </button>
+      </aside>
+    );
+  }
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`
-        w-72 h-full glass border-l border-surface-700/50
-        flex flex-col overflow-hidden
-        transition-all duration-200
-        ${isOver ? 'bg-red-900/20 border-red-500/50' : ''}
-      `}
-    >
+    <aside className="sidebar">
       {/* Header */}
-      <div className="p-4 border-b border-surface-700/50">
-        <h2 className="text-lg font-semibold text-surface-100">Node Library</h2>
-        <p className="text-xs text-surface-400 mt-1">
-          Drag nodes to the canvas to build your pipeline
-        </p>
+      <div className="sidebar-header">
+        <h2 className="sidebar-title">Node Library</h2>
+        <p className="sidebar-subtitle">Drag nodes to canvas</p>
       </div>
 
-      {/* Trash zone indicator */}
-      {isOver && (
-        <div className="mx-4 mt-4 p-4 border-2 border-dashed border-red-500/50 rounded-lg bg-red-900/20 flex items-center justify-center gap-2 animate-fade-in">
-          <Trash2 className="text-red-400" size={20} />
-          <span className="text-red-400 text-sm font-medium">Drop to delete</span>
-        </div>
-      )}
+      {/* Search */}
+      <div className="sidebar-search">
+        <Search size={16} className="sidebar-search-icon" />
+        <input
+          type="text"
+          placeholder="Search nodes..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="sidebar-search-input"
+        />
+      </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
-        {categoryOrder
-          .filter((cat) => groupedNodes[cat])
-          .map((category) => (
-            <CategorySection
-              key={category}
-              category={category}
-              nodes={groupedNodes[category]}
-              isExpanded={expandedCategories.has(category)}
-              onToggle={() => toggleCategory(category)}
-            />
-          ))}
+      {/* Node categories */}
+      <div className="sidebar-content">
+        {filteredCategories.map(({ category, definitions }) => (
+          <CategorySection
+            key={category}
+            category={category}
+            definitions={definitions}
+            isExpanded={expandedCategories.has(category)}
+            onToggle={() => handleToggleCategory(category)}
+            onDragStart={handleDragStart}
+          />
+        ))}
+
+        {filteredCategories.length === 0 && (
+          <div className="sidebar-empty">
+            <p>No nodes found</p>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-surface-700/50">
-        <div className="text-xs text-surface-500 text-center">
+      <div className="sidebar-footer">
+        <span className="text-xs text-surface-500">
           {nodeDefinitions.length} nodes available
-        </div>
+        </span>
       </div>
-    </div>
+    </aside>
   );
-}
+});
+
+export default Sidebar;
