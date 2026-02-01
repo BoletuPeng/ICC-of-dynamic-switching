@@ -1,7 +1,7 @@
 {
   "id": "stack",
   "name": "Stack",
-  "description": "Collect loop outputs and stack them back into batch dimensions. Pairs with For Loop to restore original shape structure.",
+  "description": "Collect loop outputs and stack them back into batch dimensions. Uses Loop Id Ref from For Loop to automatically restore the original shape structure.",
   "category": "control",
   "color": "#6366f1",
   "icon": "layers",
@@ -10,20 +10,20 @@
 
   "inputs": [
     {
-      "id": "data_in",
+      "id": "loop_output",
       "name": "Loop Output",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["n_inner"],
-      "description": "Processed data from loop body"
+      "shape": ["..."],
+      "description": "Processed data from loop body. Shape will be validated against Loop Id Ref."
     },
     {
-      "id": "loop_ref",
-      "name": "Loop Reference",
+      "id": "loop_id_ref",
+      "name": "Loop Id Ref",
       "type": "loop_ref",
       "dtype": "ref",
       "shape": [],
-      "description": "Reference to the corresponding For Loop node"
+      "description": "Reference from For Loop carrying the stripped dimension information for shape reconstruction."
     }
   ],
 
@@ -33,8 +33,8 @@
       "name": "Stacked Output",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["n_batch", "n_inner"],
-      "description": "Stacked output with batch dimensions restored"
+      "shape": ["..."],
+      "description": "Stacked output with batch dimensions restored. Shape equals stripped dimensions + loop output shape."
     }
   ],
 
@@ -48,7 +48,7 @@
         { "value": "append", "label": "Append (inner, batch)" }
       ],
       "default": "prepend",
-      "description": "Where to place the stacked batch dimensions"
+      "description": "Where to place the stacked batch dimensions relative to the loop output shape"
     }
   ]
 }

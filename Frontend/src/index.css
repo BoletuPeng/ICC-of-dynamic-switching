@@ -274,8 +274,46 @@ body {
 .pipeline-edge-path { transition: stroke var(--transition); }
 .pipeline-edge-flow { animation: flow 0.8s linear infinite; }
 
-.pipeline-edge-label { position: absolute; pointer-events: all; opacity: 0; transition: opacity var(--transition); }
+/* Warning animation - yellow pulsing */
+@keyframes warningPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.pipeline-edge-warning {
+  animation: flow 0.8s linear infinite, warningPulse 1.5s ease-in-out infinite;
+}
+
+/* Error animation - red faster pulse */
+@keyframes errorPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.pipeline-edge-error {
+  animation: flow 0.5s linear infinite, errorPulse 0.8s ease-in-out infinite;
+}
+
+.pipeline-edge-label {
+  position: absolute;
+  pointer-events: all;
+  opacity: 0;
+  transition: opacity var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .pipeline-edge-label.visible, .react-flow__edge:hover .pipeline-edge-label { opacity: 1; }
+
+.pipeline-edge-warning-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface-800);
+  border: 1px solid var(--color-surface-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+}
 
 .pipeline-edge-delete-btn {
   width: 20px; height: 20px;
@@ -288,6 +326,11 @@ body {
   transition: all var(--transition);
 }
 .pipeline-edge-delete-btn:hover { background: #ef4444; border-color: #ef4444; color: white; }
+
+/* Connection compatibility colors - base classes for edge paths */
+.react-flow__edge.compatibility-exact .pipeline-edge-path { stroke: #22c55e; }
+.react-flow__edge.compatibility-name-mismatch .pipeline-edge-path { stroke: #eab308; }
+.react-flow__edge.compatibility-dimension-mismatch .pipeline-edge-path { stroke: #ef4444; }
 
 /* =============================================================================
    Sidebar
