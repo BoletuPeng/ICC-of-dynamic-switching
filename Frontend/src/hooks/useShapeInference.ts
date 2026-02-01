@@ -170,6 +170,7 @@ function extractParameterBindings(
 
 /**
  * Get incoming shape for a specific port
+ * Handles both resolved (numeric) and symbolic shapes
  */
 function getIncomingShape(
   nodeId: string,
@@ -187,16 +188,30 @@ function getIncomingShape(
   if (!sourceShapeInfo) return undefined;
 
   const sourcePortShape = sourceShapeInfo.outputShapes[edge.sourceHandle || ''];
-  if (!sourcePortShape || !sourcePortShape.resolved) return undefined;
+  if (!sourcePortShape) return undefined;
 
-  // Convert ResolvedPortShape back to ResolvedShape
-  const parts = sourcePortShape.resolved.split(' × ');
+  // Handle dynamic/empty shapes
+  if (sourcePortShape.symbolic === '...' || sourcePortShape.symbolic === '') {
+    return undefined;
+  }
+
   const symbolicParts = sourcePortShape.symbolic.split(' × ');
 
-  return parts.map((value, i) => ({
-    symbolic: symbolicParts[i] || value,
-    value: parseInt(value, 10),
-    isResolved: !isNaN(parseInt(value, 10)),
+  // If we have resolved values, use them
+  if (sourcePortShape.resolved) {
+    const parts = sourcePortShape.resolved.split(' × ');
+    return parts.map((value, i) => ({
+      symbolic: symbolicParts[i] || value,
+      value: parseInt(value, 10),
+      isResolved: !isNaN(parseInt(value, 10)),
+    }));
+  }
+
+  // Otherwise, return symbolic shape without resolved values
+  return symbolicParts.map(symbolic => ({
+    symbolic,
+    value: undefined,
+    isResolved: false,
   }));
 }
 
