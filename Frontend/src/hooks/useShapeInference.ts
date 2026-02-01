@@ -422,6 +422,21 @@ function computeShapes(
 
     if (!sourceShape || !targetShape) continue;
 
+    // Skip validation for dynamic shape inputs (e.g., For Loop's "..." input)
+    // Dynamic shapes accept any input shape
+    if (targetShape.symbolic === '...' || targetShape.symbolic.includes('...')) {
+      connectionValidations[edge.id] = {
+        edgeId: edge.id,
+        sourceNodeId: edge.source,
+        sourcePortId,
+        targetNodeId: edge.target,
+        targetPortId,
+        compatibility: 'exact',
+        validation: { compatibility: 'exact', isValid: true },
+      };
+      continue;
+    }
+
     // Convert to ResolvedShape for validation
     const sourceResolved = sourceShape.resolved
       ? sourceShape.resolved.split(' × ').map((v, i) => ({
