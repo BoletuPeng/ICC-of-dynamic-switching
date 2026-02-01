@@ -14,7 +14,7 @@
       "name": "Loop Output",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["...inner"],
+      "shape": ["n_inner"],
       "description": "Processed data from loop body"
     },
     {
@@ -33,7 +33,7 @@
       "name": "Stacked Output",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["...batch", "...inner"],
+      "shape": ["n_batch", "n_inner"],
       "description": "Stacked output with batch dimensions restored"
     }
   ],
@@ -44,21 +44,11 @@
       "name": "Stack Order",
       "type": "select",
       "options": [
-        { "value": "prepend", "label": "Prepend (batch, ...inner)" },
-        { "value": "append", "label": "Append (...inner, batch)" }
+        { "value": "prepend", "label": "Prepend (batch, inner)" },
+        { "value": "append", "label": "Append (inner, batch)" }
       ],
       "default": "prepend",
       "description": "Where to place the stacked batch dimensions"
     }
-  ],
-
-  "shapeTransform": {
-    "description": "Prepends batch dimensions from referenced For Loop",
-    "outputRules": [
-      {
-        "port": "data_out",
-        "rule": "concat(loop_ref.batch_dims, input.data_in.shape)"
-      }
-    ]
-  }
+  ]
 }

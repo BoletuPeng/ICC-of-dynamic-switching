@@ -14,7 +14,7 @@
       "name": "Data Input",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["...batch", "...inner"],
+      "shape": ["n_batch", "n_inner"],
       "description": "Input data with batch dimensions to iterate over"
     }
   ],
@@ -25,16 +25,16 @@
       "name": "Loop Body",
       "type": "ndarray",
       "dtype": "any",
-      "shape": ["...inner"],
+      "shape": ["n_inner"],
       "description": "Single slice for processing (batch dimensions removed)"
     },
     {
       "id": "loop_index",
       "name": "Loop Index",
-      "type": "tuple",
+      "type": "int",
       "dtype": "int",
-      "shape": ["n_iterate_dims"],
-      "description": "Current iteration indices"
+      "shape": [],
+      "description": "Current iteration index"
     }
   ],
 
@@ -56,15 +56,5 @@
       "default": "n_batch",
       "description": "Comma-separated names for iterated dimensions (e.g., 'n_participants, n_sessions')"
     }
-  ],
-
-  "shapeTransform": {
-    "description": "Removes the first N dimensions from input shape",
-    "outputRules": [
-      {
-        "port": "data_out",
-        "rule": "input.data_in.shape.slice(@n_iterate_dims)"
-      }
-    ]
-  }
+  ]
 }
