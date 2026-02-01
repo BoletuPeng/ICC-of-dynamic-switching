@@ -18,6 +18,7 @@ import type {
 import {
   resolveShape,
   formatShapeCompact,
+  parseShapeDimension,
 } from '../engine';
 
 // =============================================================================
@@ -89,11 +90,16 @@ function buildDependencyOrder(
 }
 
 /**
- * Get shape definition from port, handling both PortDefinition and ModulePortDefinition
+ * Parse shape definition from port, handling expression strings like "n_timepoints - @window - 1"
  */
-function getShapeDefinition(port: PortDefinition): ShapeDefinition {
-  // Port shapes are always (string | number)[], which is compatible with ShapeDefinition
-  return port.shape as ShapeDefinition;
+function parsePortShape(port: PortDefinition): ShapeDefinition {
+  return port.shape.map((dim) => {
+    if (typeof dim === 'number') {
+      return dim;
+    }
+    // Parse string dimensions - this handles both simple variables and expressions
+    return parseShapeDimension(dim);
+  });
 }
 
 /**
@@ -177,11 +183,12 @@ function computeShapes(
       // If source shape is resolved, try to match and infer bindings
       if (sourceShape.resolved) {
         const sourceValues = sourceShape.resolved.split(' × ').map(Number);
-        const targetShapeDef = getShapeDefinition(targetPort as unknown as PortDefinition);
+        const targetShapeDef = parsePortShape(targetPort as unknown as PortDefinition);
 
         if (sourceValues.length === targetShapeDef.length) {
           for (let i = 0; i < targetShapeDef.length; i++) {
             const dim = targetShapeDef[i];
+            // Only bind simple string variables, not expressions
             if (typeof dim === 'string' && !isNaN(sourceValues[i])) {
               bindings[dim] = sourceValues[i];
             }
@@ -194,24 +201,24 @@ function computeShapes(
     Object.assign(globalDimensions, bindings);
     Object.assign(bindings, globalDimensions);
 
-    // Create context
+    // Create context with both dimensions and parameters
     const context: ShapeContext = {
       dimensions: bindings,
       parameters: node.data.parameters,
     };
 
-    // Resolve input shapes - use node.data.inputs which has the PortDefinition type
+    // Resolve input shapes - parse expressions and evaluate
     const inputShapes: Record<string, ResolvedPortShape> = {};
     for (const input of node.data.inputs) {
-      const shapeDef = getShapeDefinition(input);
+      const shapeDef = parsePortShape(input);
       const resolved = resolveShape(shapeDef, context);
       inputShapes[input.id] = toPortShape(resolved);
     }
 
-    // Resolve output shapes - use node.data.outputs which has the PortDefinition type
+    // Resolve output shapes - parse expressions and evaluate
     const outputShapes: Record<string, ResolvedPortShape> = {};
     for (const output of node.data.outputs) {
-      const shapeDef = getShapeDefinition(output);
+      const shapeDef = parsePortShape(output);
       const resolved = resolveShape(shapeDef, context);
       outputShapes[output.id] = toPortShape(resolved);
     }
