@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Icon, X } from './Icons';
 import { nodeDefinitionsMap } from '../data';
 import { usePipelineStore } from '../store/pipelineStore';
-import type { ParameterDefinition, SelectOption } from '../types';
+import type { ParameterDefinition, SelectOption, PipelineNode, NodeDefinition } from '../types';
 
 interface ParameterInputProps {
   param: ParameterDefinition;
@@ -131,38 +131,29 @@ function ParameterInput({ param, value, onChange }: ParameterInputProps) {
   }
 }
 
-export function NodeEditor() {
-  const { editingNodeId, setEditingNode, nodes, updateNodeParameters } = usePipelineStore();
+interface NodeEditorContentProps {
+  node: PipelineNode;
+  definition: NodeDefinition;
+}
 
-  const node = nodes.find((n) => n.id === editingNodeId);
-  const definition = node ? nodeDefinitionsMap[node.definitionId] : null;
+function NodeEditorContent({ node, definition }: NodeEditorContentProps) {
+  const { setEditingNode, updateNodeParameters } = usePipelineStore();
 
-  const [localParams, setLocalParams] = useState<Record<string, unknown>>({});
-
-  useEffect(() => {
-    if (node) {
-      setLocalParams({ ...node.parameters });
-    }
-  }, [node]);
+  // Initialize state directly from props - component remounts via key when node changes
+  const [localParams, setLocalParams] = useState<Record<string, unknown>>(() => ({ ...node.parameters }));
 
   const handleParamChange = useCallback((paramId: string, value: unknown) => {
     setLocalParams((prev) => ({ ...prev, [paramId]: value }));
   }, []);
 
   const handleSave = useCallback(() => {
-    if (editingNodeId) {
-      updateNodeParameters(editingNodeId, localParams);
-      setEditingNode(null);
-    }
-  }, [editingNodeId, localParams, updateNodeParameters, setEditingNode]);
+    updateNodeParameters(node.id, localParams);
+    setEditingNode(null);
+  }, [node.id, localParams, updateNodeParameters, setEditingNode]);
 
   const handleClose = useCallback(() => {
     setEditingNode(null);
   }, [setEditingNode]);
-
-  if (!editingNodeId || !node || !definition) {
-    return null;
-  }
 
   return (
     <div
@@ -272,4 +263,18 @@ export function NodeEditor() {
       </div>
     </div>
   );
+}
+
+export function NodeEditor() {
+  const { editingNodeId, nodes } = usePipelineStore();
+
+  const node = nodes.find((n) => n.id === editingNodeId);
+  const definition = node ? nodeDefinitionsMap[node.definitionId] : null;
+
+  if (!editingNodeId || !node || !definition) {
+    return null;
+  }
+
+  // Use key to force remount when editing different nodes, resetting local state
+  return <NodeEditorContent key={editingNodeId} node={node} definition={definition} />;
 }
