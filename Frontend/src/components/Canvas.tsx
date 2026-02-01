@@ -1,17 +1,10 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { NodeCard } from './NodeCard';
 import { ConnectionLine } from './ConnectionLine';
 import { usePipelineStore } from '../store/pipelineStore';
 import { nodeDefinitionsMap } from '../data';
-import type { Position, PortType } from '../types';
-
-interface PortPosition {
-  nodeId: string;
-  portId: string;
-  portType: PortType;
-  position: Position;
-}
+import type { Position, PortType, PipelineNode } from '../types';
 
 interface ConnectionState {
   sourceNodeId: string;
@@ -21,81 +14,71 @@ interface ConnectionState {
   currentPosition: Position;
 }
 
+// Constants for node dimensions
+const NODE_WIDTH = 220;
+const NODE_HEADER_HEIGHT = 36;
+const PORT_HEIGHT = 28;
+const PORT_PADDING = 12;
+const PORT_RADIUS = 6;
+
+// Calculate port position based on node position and port index
+function calculatePortPosition(
+  node: PipelineNode,
+  portId: string,
+  portType: PortType,
+  viewOffset: Position
+): Position | null {
+  const definition = nodeDefinitionsMap[node.definitionId];
+  if (!definition) return null;
+
+  const ports = portType === 'input' ? definition.inputs : definition.outputs;
+  const portIndex = ports.findIndex((p) => p.id === portId);
+  if (portIndex === -1) return null;
+
+  const x = portType === 'input'
+    ? node.position.x + PORT_RADIUS + viewOffset.x
+    : node.position.x + NODE_WIDTH - PORT_RADIUS + viewOffset.x;
+
+  const y = node.position.y + NODE_HEADER_HEIGHT + PORT_PADDING + (portIndex * PORT_HEIGHT) + PORT_HEIGHT / 2 + viewOffset.y;
+
+  return { x, y };
+}
+
 export function Canvas() {
-  const { nodes, connections, selectNode, addConnection, removeConnection } = usePipelineStore();
+  const { nodes, connections, selectNode, addConnection, removeConnection, setEditingNode } = usePipelineStore();
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [portPositions, setPortPositions] = useState<Map<string, PortPosition>>(new Map());
   const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
   const [viewOffset, setViewOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [spacePressed, setSpacePressed] = useState(false);
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-dropzone',
   });
 
-  // Register port positions
-  const registerPort = useCallback(
-    (nodeId: string, portId: string, portType: PortType, element: HTMLDivElement | null) => {
-      const key = `${nodeId}-${portId}-${portType}`;
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        const canvasRect = canvasRef.current?.getBoundingClientRect();
-        if (canvasRect) {
-          setPortPositions((prev) => {
-            const next = new Map(prev);
-            next.set(key, {
-              nodeId,
-              portId,
-              portType,
-              position: {
-                x: rect.left + rect.width / 2 - canvasRect.left,
-                y: rect.top + rect.height / 2 - canvasRect.top,
-              },
-            });
-            return next;
-          });
-        }
-      } else {
-        setPortPositions((prev) => {
-          const next = new Map(prev);
-          next.delete(key);
-          return next;
-        });
-      }
-    },
-    []
-  );
-
-  // Update port positions on scroll/resize
+  // Handle keyboard events for space bar panning
   useEffect(() => {
-    const updatePositions = () => {
-      if (!canvasRef.current) return;
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-
-      setPortPositions((prev) => {
-        const next = new Map<string, PortPosition>();
-        prev.forEach((value, key) => {
-          const element = document.querySelector(`[data-port-key="${key}"]`) as HTMLDivElement;
-          if (element) {
-            const rect = element.getBoundingClientRect();
-            next.set(key, {
-              ...value,
-              position: {
-                x: rect.left + rect.width / 2 - canvasRect.left,
-                y: rect.top + rect.height / 2 - canvasRect.top,
-              },
-            });
-          } else {
-            next.set(key, value);
-          }
-        });
-        return next;
-      });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault();
+        setSpacePressed(true);
+      }
     };
 
-    window.addEventListener('resize', updatePositions);
-    return () => window.removeEventListener('resize', updatePositions);
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setSpacePressed(false);
+        setIsPanning(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, []);
 
   // Handle connection start
@@ -121,33 +104,62 @@ export function Canvas() {
     []
   );
 
-  // Handle connection end
+  // Handle connection end with validation
   const handleEndConnection = useCallback(
     (nodeId: string, portId: string, portType: PortType) => {
-      if (connectionState && connectionState.sourceNodeId !== nodeId) {
-        // Can only connect output to input
-        if (connectionState.sourceType === 'output' && portType === 'input') {
-          addConnection({
-            sourceNodeId: connectionState.sourceNodeId,
-            sourcePortId: connectionState.sourcePortId,
-            targetNodeId: nodeId,
-            targetPortId: portId,
-          });
-        } else if (connectionState.sourceType === 'input' && portType === 'output') {
-          addConnection({
-            sourceNodeId: nodeId,
-            sourcePortId: portId,
-            targetNodeId: connectionState.sourceNodeId,
-            targetPortId: connectionState.sourcePortId,
-          });
-        }
+      if (!connectionState) {
+        return;
       }
+
+      // Prevent self-connection
+      if (connectionState.sourceNodeId === nodeId) {
+        setConnectionState(null);
+        return;
+      }
+
+      // Determine source and target
+      let sourceNodeId: string, sourcePortId: string, targetNodeId: string, targetPortId: string;
+
+      if (connectionState.sourceType === 'output' && portType === 'input') {
+        sourceNodeId = connectionState.sourceNodeId;
+        sourcePortId = connectionState.sourcePortId;
+        targetNodeId = nodeId;
+        targetPortId = portId;
+      } else if (connectionState.sourceType === 'input' && portType === 'output') {
+        sourceNodeId = nodeId;
+        sourcePortId = portId;
+        targetNodeId = connectionState.sourceNodeId;
+        targetPortId = connectionState.sourcePortId;
+      } else {
+        // Invalid connection type (output to output or input to input)
+        setConnectionState(null);
+        return;
+      }
+
+      // Check for duplicate connection
+      const isDuplicate = connections.some(
+        (c) =>
+          c.sourceNodeId === sourceNodeId &&
+          c.sourcePortId === sourcePortId &&
+          c.targetNodeId === targetNodeId &&
+          c.targetPortId === targetPortId
+      );
+
+      if (!isDuplicate) {
+        addConnection({
+          sourceNodeId,
+          sourcePortId,
+          targetNodeId,
+          targetPortId,
+        });
+      }
+
       setConnectionState(null);
     },
-    [connectionState, addConnection]
+    [connectionState, connections, addConnection]
   );
 
-  // Handle mouse move for connection drawing
+  // Handle mouse move for connection drawing and panning
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (connectionState && canvasRef.current) {
@@ -189,41 +201,64 @@ export function Canvas() {
     };
   }, [connectionState, isPanning, panStart]);
 
-  // Handle canvas pan
+  // Handle canvas mouse events
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 1 || (e.button === 0 && e.altKey)) {
-      // Middle click or Alt+click
+    // Middle click, Alt+click, or Space+click for panning
+    if (e.button === 1 || (e.button === 0 && e.altKey) || (e.button === 0 && spacePressed)) {
       e.preventDefault();
       setIsPanning(true);
       setPanStart({ x: e.clientX, y: e.clientY });
     }
   };
 
-  // Get connection line positions
-  const getConnectionPositions = useCallback(
-    (sourceNodeId: string, sourcePortId: string, targetNodeId: string, targetPortId: string) => {
-      const sourceKey = `${sourceNodeId}-${sourcePortId}-output`;
-      const targetKey = `${targetNodeId}-${targetPortId}-input`;
-      const source = portPositions.get(sourceKey);
-      const target = portPositions.get(targetKey);
-
-      if (source && target) {
-        return { start: source.position, end: target.position };
-      }
-      return null;
+  // Handle right-click on connection to delete
+  const handleConnectionRightClick = useCallback(
+    (connectionId: string, e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      removeConnection(connectionId);
     },
-    [portPositions]
+    [removeConnection]
   );
 
-  // Get color for connection
-  const getConnectionColor = useCallback((sourceNodeId: string) => {
-    const node = nodes.find((n) => n.id === sourceNodeId);
+  // Handle double-click on node to open editor
+  const handleNodeDoubleClick = useCallback(
+    (nodeId: string) => {
+      setEditingNode(nodeId);
+    },
+    [setEditingNode]
+  );
+
+  // Calculate connection positions based on node positions
+  const connectionPositions = useMemo(() => {
+    return connections.map((conn) => {
+      const sourceNode = nodes.find((n) => n.id === conn.sourceNodeId);
+      const targetNode = nodes.find((n) => n.id === conn.targetNodeId);
+
+      if (!sourceNode || !targetNode) return null;
+
+      const start = calculatePortPosition(sourceNode, conn.sourcePortId, 'output', viewOffset);
+      const end = calculatePortPosition(targetNode, conn.targetPortId, 'input', viewOffset);
+
+      if (!start || !end) return null;
+
+      const sourceDefinition = nodeDefinitionsMap[sourceNode.definitionId];
+      const color = sourceDefinition?.color || '#0ea5e9';
+
+      return { conn, start, end, color };
+    }).filter(Boolean);
+  }, [connections, nodes, viewOffset]);
+
+  // Get color for connection being drawn
+  const getDrawingConnectionColor = useMemo(() => {
+    if (!connectionState) return '#0ea5e9';
+    const node = nodes.find((n) => n.id === connectionState.sourceNodeId);
     if (node) {
       const definition = nodeDefinitionsMap[node.definitionId];
       return definition?.color || '#0ea5e9';
     }
     return '#0ea5e9';
-  }, [nodes]);
+  }, [connectionState, nodes]);
 
   return (
     <div
@@ -236,14 +271,16 @@ export function Canvas() {
         flex-1 relative overflow-hidden h-full
         bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950
         ${isOver ? 'ring-2 ring-inset ring-primary-500/50' : ''}
-        ${isPanning ? 'cursor-grabbing' : 'cursor-default'}
+        ${isPanning || spacePressed ? 'cursor-grab' : 'cursor-default'}
+        ${isPanning ? 'cursor-grabbing' : ''}
       `}
       onClick={() => selectNode(null)}
       onMouseDown={handleCanvasMouseDown}
+      onContextMenu={(e) => e.preventDefault()}
     >
       {/* Grid background */}
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
@@ -256,7 +293,7 @@ export function Canvas() {
 
       {/* Large grid */}
       <div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-10 pointer-events-none"
         style={{
           backgroundImage: `
             linear-gradient(rgba(148, 163, 184, 0.2) 2px, transparent 2px),
@@ -268,7 +305,7 @@ export function Canvas() {
       />
 
       {/* Connection SVG layer */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3" result="coloredBlur" />
@@ -281,22 +318,17 @@ export function Canvas() {
 
         <g filter="url(#glow)">
           {/* Existing connections */}
-          {connections.map((conn) => {
-            const positions = getConnectionPositions(
-              conn.sourceNodeId,
-              conn.sourcePortId,
-              conn.targetNodeId,
-              conn.targetPortId
-            );
-            if (!positions) return null;
+          {connectionPositions.map((item) => {
+            if (!item) return null;
+            const { conn, start, end, color } = item;
 
             return (
               <ConnectionLine
                 key={conn.id}
-                start={positions.start}
-                end={positions.end}
-                color={getConnectionColor(conn.sourceNodeId)}
-                onClick={() => removeConnection(conn.id)}
+                start={start}
+                end={end}
+                color={color}
+                onRightClick={(e) => handleConnectionRightClick(conn.id, e)}
               />
             );
           })}
@@ -306,25 +338,33 @@ export function Canvas() {
             <ConnectionLine
               start={connectionState.startPosition}
               end={connectionState.currentPosition}
-              color="#0ea5e9"
+              color={getDrawingConnectionColor}
               isTemporary
             />
           )}
         </g>
       </svg>
 
-      {/* Nodes */}
-      {nodes.map((node) => (
-        <NodeCard
-          key={node.id}
-          node={node}
-          connections={connections}
-          isSelected={usePipelineStore.getState().selectedNodeId === node.id}
-          onStartConnection={handleStartConnection}
-          onEndConnection={handleEndConnection}
-          registerPort={registerPort}
-        />
-      ))}
+      {/* Nodes container with view offset */}
+      <div
+        className="absolute inset-0"
+        style={{
+          transform: `translate(${viewOffset.x}px, ${viewOffset.y}px)`,
+          zIndex: 10,
+        }}
+      >
+        {nodes.map((node) => (
+          <NodeCard
+            key={node.id}
+            node={node}
+            connections={connections}
+            isSelected={usePipelineStore.getState().selectedNodeId === node.id}
+            onStartConnection={handleStartConnection}
+            onEndConnection={handleEndConnection}
+            onDoubleClick={handleNodeDoubleClick}
+          />
+        ))}
+      </div>
 
       {/* Empty state */}
       {nodes.length === 0 && (
@@ -354,9 +394,10 @@ export function Canvas() {
       )}
 
       {/* Controls hint */}
-      <div className="absolute bottom-4 left-4 text-xs text-surface-500 glass px-3 py-2 rounded-lg">
-        <span className="text-surface-400">Alt + Drag</span> to pan &nbsp;·&nbsp;
-        <span className="text-surface-400">Click connection</span> to delete
+      <div className="absolute bottom-4 left-4 text-xs text-surface-500 glass px-3 py-2 rounded-lg z-20">
+        <span className="text-surface-400">Space/Alt + Drag</span> to pan &nbsp;·&nbsp;
+        <span className="text-surface-400">Right-click line</span> to delete &nbsp;·&nbsp;
+        <span className="text-surface-400">Double-click node</span> to edit
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Icon, Settings, Trash2 } from './Icons';
@@ -13,7 +13,7 @@ interface NodeCardProps {
   isSelected: boolean;
   onStartConnection: (nodeId: string, portId: string, portType: PortType, position: { x: number; y: number }) => void;
   onEndConnection: (nodeId: string, portId: string, portType: PortType) => void;
-  registerPort: (nodeId: string, portId: string, portType: PortType, element: HTMLDivElement | null) => void;
+  onDoubleClick: (nodeId: string) => void;
 }
 
 export function NodeCard({
@@ -22,7 +22,7 @@ export function NodeCard({
   isSelected,
   onStartConnection,
   onEndConnection,
-  registerPort,
+  onDoubleClick,
 }: NodeCardProps) {
   const definition = nodeDefinitionsMap[node.definitionId];
   const { selectNode, setEditingNode, removeNode } = usePipelineStore();
@@ -54,6 +54,14 @@ export function NodeCard({
     [connections, node.id]
   );
 
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onDoubleClick(node.id);
+    },
+    [node.id, onDoubleClick]
+  );
+
   if (!definition) {
     return null;
   }
@@ -64,10 +72,10 @@ export function NodeCard({
       style={style}
       className={`
         absolute select-none
-        min-w-[220px] max-w-[280px]
+        w-[220px]
         rounded-xl overflow-hidden
         transition-shadow duration-200
-        ${isDragging ? 'z-50 cursor-grabbing' : 'z-10 cursor-grab'}
+        ${isDragging ? 'z-50 cursor-grabbing opacity-80' : 'z-10 cursor-grab'}
         ${isSelected ? 'ring-2 ring-primary-400 ring-offset-2 ring-offset-surface-900' : ''}
         ${isDragging ? 'shadow-2xl shadow-black/50' : 'shadow-lg shadow-black/30'}
       `}
@@ -75,8 +83,9 @@ export function NodeCard({
         e.stopPropagation();
         selectNode(node.id);
       }}
+      onDoubleClick={handleDoubleClick}
     >
-      {/* Header */}
+      {/* Header - draggable area */}
       <div
         className="px-3 py-2 flex items-center gap-2"
         style={{ backgroundColor: definition.color }}
@@ -124,7 +133,6 @@ export function NodeCard({
                 isConnected={connectedInputs.has(input.id)}
                 onStartConnection={onStartConnection}
                 onEndConnection={onEndConnection}
-                registerPort={registerPort}
               />
             ))}
           </div>
@@ -141,7 +149,6 @@ export function NodeCard({
                 isConnected={connectedOutputs.has(output.id)}
                 onStartConnection={onStartConnection}
                 onEndConnection={onEndConnection}
-                registerPort={registerPort}
               />
             ))}
           </div>

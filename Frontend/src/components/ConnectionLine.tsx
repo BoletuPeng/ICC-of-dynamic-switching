@@ -6,7 +6,7 @@ interface ConnectionLineProps {
   end: Position;
   color?: string;
   isTemporary?: boolean;
-  onClick?: () => void;
+  onRightClick?: (e: React.MouseEvent) => void;
 }
 
 export function ConnectionLine({
@@ -14,7 +14,7 @@ export function ConnectionLine({
   end,
   color = '#0ea5e9',
   isTemporary = false,
-  onClick,
+  onRightClick,
 }: ConnectionLineProps) {
   const path = useMemo(() => {
     const dx = end.x - start.x;
@@ -30,15 +30,16 @@ export function ConnectionLine({
   }, [start, end]);
 
   return (
-    <g>
+    <g className={onRightClick ? 'cursor-pointer' : ''}>
       {/* Wider invisible stroke for easier clicking */}
-      {onClick && (
+      {onRightClick && (
         <path
           d={path}
           fill="none"
           stroke="transparent"
           strokeWidth={20}
-          onClick={onClick}
+          onContextMenu={onRightClick}
+          style={{ pointerEvents: 'stroke' }}
           className="cursor-pointer"
         />
       )}
@@ -51,6 +52,7 @@ export function ConnectionLine({
         strokeWidth={isTemporary ? 2 : 4}
         strokeOpacity={0.3}
         className="blur-sm"
+        style={{ pointerEvents: 'none' }}
       />
 
       {/* Main line */}
@@ -60,25 +62,20 @@ export function ConnectionLine({
         stroke={color}
         strokeWidth={isTemporary ? 2 : 3}
         strokeLinecap="round"
-        className={`
-          transition-all duration-200
-          ${isTemporary ? 'stroke-dasharray-4-4 opacity-60' : ''}
-          ${onClick ? 'hover:stroke-[4px] cursor-pointer' : ''}
-        `}
-        style={isTemporary ? { strokeDasharray: '8 4' } : undefined}
-        onClick={onClick}
+        className="transition-all duration-200"
+        style={isTemporary ? { strokeDasharray: '8 4', pointerEvents: 'none' } : { pointerEvents: 'none' }}
       />
 
       {/* Animated flow particles (only for established connections) */}
       {!isTemporary && (
         <>
-          <circle r={4} fill={color}>
+          <circle r={4} fill={color} style={{ pointerEvents: 'none' }}>
             <animateMotion dur="2s" repeatCount="indefinite" path={path} />
           </circle>
-          <circle r={4} fill={color} opacity={0.5}>
+          <circle r={4} fill={color} opacity={0.5} style={{ pointerEvents: 'none' }}>
             <animateMotion dur="2s" repeatCount="indefinite" path={path} begin="0.66s" />
           </circle>
-          <circle r={4} fill={color} opacity={0.3}>
+          <circle r={4} fill={color} opacity={0.3} style={{ pointerEvents: 'none' }}>
             <animateMotion dur="2s" repeatCount="indefinite" path={path} begin="1.33s" />
           </circle>
         </>

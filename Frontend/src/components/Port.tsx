@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import type { PortType, PortDefinition } from '../types';
 
 interface PortProps {
@@ -9,7 +9,6 @@ interface PortProps {
   isConnected: boolean;
   onStartConnection: (nodeId: string, portId: string, portType: PortType, position: { x: number; y: number }) => void;
   onEndConnection: (nodeId: string, portId: string, portType: PortType) => void;
-  registerPort: (nodeId: string, portId: string, portType: PortType, element: HTMLDivElement | null) => void;
 }
 
 export function Port({
@@ -20,21 +19,14 @@ export function Port({
   isConnected,
   onStartConnection,
   onEndConnection,
-  registerPort,
 }: PortProps) {
   const portRef = useRef<HTMLDivElement>(null);
   const isInput = type === 'input';
 
-  useEffect(() => {
-    registerPort(nodeId, port.id, type, portRef.current);
-    return () => {
-      registerPort(nodeId, port.id, type, null);
-    };
-  }, [nodeId, port.id, type, registerPort]);
-
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       if (portRef.current) {
         const rect = portRef.current.getBoundingClientRect();
         const position = {
@@ -57,7 +49,7 @@ export function Port({
 
   return (
     <div
-      className={`flex items-center gap-2 py-1 ${
+      className={`flex items-center gap-2 h-7 ${
         isInput ? 'flex-row' : 'flex-row-reverse'
       }`}
     >
@@ -66,7 +58,7 @@ export function Port({
         className={`
           w-3 h-3 rounded-full cursor-crosshair
           transition-all duration-200 ease-out
-          border-2 hover:scale-125
+          border-2 hover:scale-150
           ${isConnected
             ? 'border-white bg-current shadow-lg shadow-current/50'
             : 'border-current bg-transparent hover:bg-current/30'
@@ -77,7 +69,7 @@ export function Port({
         onMouseUp={handleMouseUp}
         title={`${port.name}: ${port.description}`}
       />
-      <span className="text-xs text-surface-400 truncate max-w-[100px]">
+      <span className="text-xs text-surface-400 truncate max-w-[80px]">
         {port.name}
       </span>
     </div>
