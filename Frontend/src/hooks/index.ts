@@ -6,3 +6,4 @@
 
 export { useFileOperations } from './useFileOperations';
 export { useNodeDrag } from './useNodeDrag';
+export { useShapeInference, useNodeShapeInfo } from './useShapeInference';

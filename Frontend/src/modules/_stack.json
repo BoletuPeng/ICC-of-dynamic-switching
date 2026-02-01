@@ -1,0 +1,64 @@
+{
+  "id": "stack",
+  "name": "Stack",
+  "description": "Collect loop outputs and stack them back into batch dimensions. Pairs with For Loop to restore original shape structure.",
+  "category": "control",
+  "color": "#6366f1",
+  "icon": "layers",
+  "isControlFlow": true,
+  "controlFlowType": "stack",
+
+  "inputs": [
+    {
+      "id": "data_in",
+      "name": "Loop Output",
+      "type": "ndarray",
+      "dtype": "any",
+      "shape": ["...inner"],
+      "description": "Processed data from loop body"
+    },
+    {
+      "id": "loop_ref",
+      "name": "Loop Reference",
+      "type": "loop_ref",
+      "dtype": "ref",
+      "shape": [],
+      "description": "Reference to the corresponding For Loop node"
+    }
+  ],
+
+  "outputs": [
+    {
+      "id": "data_out",
+      "name": "Stacked Output",
+      "type": "ndarray",
+      "dtype": "any",
+      "shape": ["...batch", "...inner"],
+      "description": "Stacked output with batch dimensions restored"
+    }
+  ],
+
+  "parameters": [
+    {
+      "id": "stack_order",
+      "name": "Stack Order",
+      "type": "select",
+      "options": [
+        { "value": "prepend", "label": "Prepend (batch, ...inner)" },
+        { "value": "append", "label": "Append (...inner, batch)" }
+      ],
+      "default": "prepend",
+      "description": "Where to place the stacked batch dimensions"
+    }
+  ],
+
+  "shapeTransform": {
+    "description": "Prepends batch dimensions from referenced For Loop",
+    "outputRules": [
+      {
+        "port": "data_out",
+        "rule": "concat(loop_ref.batch_dims, input.data_in.shape)"
+      }
+    ]
+  }
+}

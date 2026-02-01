@@ -34,8 +34,8 @@ export interface ParameterDefinition {
 }
 
 export type NodeCategory =
-  | 'preprocessing' | 'connectivity' | 'community'
-  | 'metrics' | 'analysis' | 'clustering' | 'output';
+  | 'input' | 'preprocessing' | 'connectivity' | 'community'
+  | 'metrics' | 'analysis' | 'clustering' | 'output' | 'control';
 
 export interface NodeDefinition {
   id: string;
@@ -53,6 +53,18 @@ export interface NodeDefinition {
 // React Flow Types
 // =============================================================================
 
+/**
+ * Resolved shape information for display
+ */
+export interface ResolvedPortShape {
+  /** Original symbolic shape definition */
+  symbolic: string;
+  /** Resolved numeric values (if known) */
+  resolved: string | null;
+  /** Whether all dimensions are resolved */
+  isFullyResolved: boolean;
+}
+
 export type PipelineNodeData = {
   definitionId: string;
   label: string;
@@ -64,6 +76,18 @@ export type PipelineNodeData = {
   outputs: PortDefinition[];
   parameters: Record<string, unknown>;
   parameterDefinitions: ParameterDefinition[];
+
+  /** Resolved input shapes (computed by shape engine) */
+  resolvedInputShapes?: Record<string, ResolvedPortShape>;
+  /** Resolved output shapes (computed by shape engine) */
+  resolvedOutputShapes?: Record<string, ResolvedPortShape>;
+  /** Known dimension bindings for this node */
+  dimensionBindings?: Record<string, number>;
+
+  /** Control flow specific fields */
+  isControlFlow?: boolean;
+  controlFlowType?: 'for' | 'stack';
+
   [key: string]: unknown;
 };
 
@@ -118,6 +142,7 @@ export interface SerializedPipeline {
 // =============================================================================
 
 export const CATEGORY_COLORS: Record<NodeCategory, string> = {
+  input: '#22c55e',
   preprocessing: '#10b981',
   connectivity: '#3b82f6',
   community: '#8b5cf6',
@@ -125,9 +150,11 @@ export const CATEGORY_COLORS: Record<NodeCategory, string> = {
   analysis: '#ec4899',
   clustering: '#06b6d4',
   output: '#ef4444',
+  control: '#6366f1',
 };
 
 export const CATEGORY_LABELS: Record<NodeCategory, string> = {
+  input: 'Input',
   preprocessing: 'Preprocessing',
   connectivity: 'Connectivity',
   community: 'Community Detection',
@@ -135,4 +162,5 @@ export const CATEGORY_LABELS: Record<NodeCategory, string> = {
   analysis: 'Analysis',
   clustering: 'Clustering',
   output: 'Output',
+  control: 'Control Flow',
 };

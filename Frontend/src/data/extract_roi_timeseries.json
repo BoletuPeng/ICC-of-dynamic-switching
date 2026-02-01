@@ -11,8 +11,8 @@
       "name": "BOLD Data",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_timepoints", "n_vertices"],
-      "description": "Preprocessed BOLD fMRI data"
+      "shape": ["n_vertices", "n_timepoints"],
+      "description": "Preprocessed BOLD fMRI data [VERTICES × TIME]"
     },
     {
       "id": "atlas",
@@ -29,8 +29,8 @@
       "name": "ROI Time Series",
       "type": "ndarray",
       "dtype": "float64",
-      "shape": ["n_timepoints", "n_rois"],
-      "description": "Extracted ROI-averaged time series"
+      "shape": ["n_rois", "n_timepoints"],
+      "description": "Extracted ROI-averaged time series [ROIS × TIME]"
     }
   ],
   "parameters": [
@@ -46,7 +46,11 @@
       "id": "atlas_name",
       "name": "Atlas Name",
       "type": "select",
-      "options": ["Schaefer300", "Schaefer400", "Kong300"],
+      "options": [
+        {"value": "Schaefer300", "label": "Schaefer 300 Parcels (n_rois=300)"},
+        {"value": "Schaefer400", "label": "Schaefer 400 Parcels (n_rois=400)"},
+        {"value": "Kong300", "label": "Kong 300 Parcels (n_rois=300)"}
+      ],
       "default": "Schaefer300",
       "description": "Brain parcellation atlas to use"
     },
